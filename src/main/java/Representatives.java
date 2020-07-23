@@ -53,14 +53,14 @@ public class Representatives {
                     System.out.println("Pdf file created");
 
                 }
-                pdfManager.setFilePath("transaction.pdf");
-                try {
-                    String text = pdfManager.toText();
-
-                    System.out.println(text);
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
-                }
+//                pdfManager.setFilePath("transaction.pdf");
+//                try {
+//                    String text = pdfManager.toText();
+//
+//                    System.out.println(text);
+//                } catch (IOException ex) {
+//                    System.out.println(ex.getMessage());
+//                }
 //                try (PDDocument pdDocument = PDDocument.load(new File("transaction.pdf"))) {
 //                    pdDocument.getClass();
 //
