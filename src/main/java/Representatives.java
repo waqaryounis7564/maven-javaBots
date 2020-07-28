@@ -11,12 +11,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,8 +40,7 @@ public class Representatives {
                 String office = row.select("td:nth-child(2)").text();
                 String fillingYear = row.select("td:nth-child(3)").text();
                 String filling = row.select("td:nth-child(4)").text();
-                if (filling.contains("Term. Exemption")) continue;
-                PdfManager pdfManager = new PdfManager();
+                if (filling.contains("Term. Exemption") || filling.contains("Termination")) continue;
 
                 Page pdf = webClient.getPage(pdfUrl);
                 if (pdf.getWebResponse().getContentType().equals("application/pdf")) {
@@ -51,69 +48,73 @@ public class Representatives {
                     IOUtils.copy(pdf.getWebResponse().getContentAsStream(),
                             new FileOutputStream("transaction.pdf"));
                     System.out.println("Pdf file created");
-
                 }
-//                pdfManager.setFilePath("transaction.pdf");
-//                try {
-//                    String text = pdfManager.toText();
-//
-//                    System.out.println(text);
-//                } catch (IOException ex) {
-//                    System.out.println(ex.getMessage());
-//                }
-//                try (PDDocument pdDocument = PDDocument.load(new File("transaction.pdf"))) {
-//                    pdDocument.getClass();
-//
-//                    if (!pdDocument.isEncrypted()) {
-//
-//                        PDFTextStripper tStripper = new PDFTextStripper();
-//                       // stripper.setSortByPosition(true);
-//
-//                      //  PDFTextStripper tStripper = new PDFTextStripper();
-//
-//                        String pdfFileInText = tStripper.getText(pdDocument);
-//                        //System.out.println("Text:" + st);
-//
-//                        // split by whitespace
-//                        String[] lines = pdfFileInText.split("\\r?\\n");
-//                        for (String line : lines) {
-//                            System.out.println(line);
-//                        }
-//                    }
-//                }
-//                    PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-//                    stripper.setSortByPosition(true);
-//                    PDFTextStripper tStripper = new PDFTextStripper();
-//                    String stringPdf = tStripper.getText(pdDocument);
-//                    String[] lines = stringPdf.split("\\n");
-//                    String namePattern = "Name:\\s+(.+)";
-//                    String filingPattern="Filing\\sID+(.+)";
-//                    Pattern p = Pattern.compile(filingPattern);
-//                    String price = "";
-//                    for (String line : lines) {
-//                        Matcher m = p.matcher(line);
-//                        if (m.find()) {
-//                            price = m.group(1);
-//                        }
-//                    }
-//                    if (!price.isEmpty()) {
-//                        System.out.println("NAme found: " + price);
-//                    } else {
-//                        System.out.println("Name not found"+" "+pdfUrl);
-//                    }
-//                }
 
-//                System.out.println(name);
-//                System.out.println(href);
-//                System.out.println(office);
-//                System.out.println(fillingYear);
-//                System.out.println(filling);
-                            System.out.println("---------------------------");
+                try (PDDocument pdDocument = PDDocument.load(new File("transaction.pdf"))) {
+
+                    PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+                    stripper.setSortByPosition(true);
+                    PDFTextStripper tStripper = new PDFTextStripper();
+                    String stringPdf = tStripper.getText(pdDocument);
+                    String[] lines = stringPdf.split("^(?!.* {2}).+");
+
+                    if (lines.length > 1) {
+
+
+                        String result = lines[1].replaceAll("[\\t\\n\\r]+", " ");
+//                        System.out.println(result);
+                        int startIndex = result.indexOf("?") + 1;
+                        if (startIndex > 1) {
+                            int endIndex = result.indexOf("*");
+
+//                        System.out.println(result);
+//                        int end = result.indexOf("]");
+                            String pr = result.substring(startIndex, endIndex);
+//                            System.out.println(pr);
+                            String[] anns = pr.split("gfedc");
+                            for (String ann : anns) {
+                               System.out.println(ann);
+                                //if(ann.contains(""))
+                                int i = ann.indexOf("]");
+//                                if (i > 0) {
+//
+//                                    System.out.println("Transaction type" + " " + ann.substring(i+1, i + 3));
+//                                }
+                            }
+
+                            pdDocument.close();
+                            System.out.println(pdfUrl);
                         }
-
-
                     }
+                    System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+//                        Pattern p = Pattern.compile("\\$\\d+(?:,+\\d+)..........");
+//                        Matcher m = p.matcher(result);
+//                        if (m.find()) {
+//                            System.out.println(m.group());
+//                        }
+//                    int endIndex = 0;
+//                    for (String line : lines) {
+//                        endIndex++;
+//                        if (line.contains("* For the complete list of asset type abbreviations,")) break;
+//                    }
+//                    for (int line = 2; line <= endIndex - 1; line++) {
+//                        System.out.println(lines[line]);
+//                    }
+
+//                    if (lines.length > 14) {
+//                        String[] newArray = Arrays.copyOfRange(lines, 14, endIndex - 1);
+//                        for (String ln : newArray) {
+//
+//                        }
+//                    }
+                    //}
+
                 }
+
             }
+        }
+    }
+}
+
 
 
