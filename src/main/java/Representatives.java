@@ -73,13 +73,17 @@ public class Representatives {
 //                            System.out.println(pr);
                             String[] anns = pr.split("gfedc");
                             for (String ann : anns) {
-                               System.out.println(ann);
-                                //if(ann.contains(""))
-                                int i = ann.indexOf("]");
-//                                if (i > 0) {
+                                if (ann.contains("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?")) {
+                                    ann = ann.replace("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?", " ");
+
+//                                    int i = ann.indexOf("]");
+//                                    if (i > 0) {
 //
-//                                    System.out.println("Transaction type" + " " + ann.substring(i+1, i + 3));
-//                                }
+//                                        System.out.println("Transaction type" + " " + ann.substring(i + 1, i + 3));
+//                                    }
+                                    System.out.println(ann);
+                                }
+                                System.out.println(ann);
                             }
 
                             pdDocument.close();
