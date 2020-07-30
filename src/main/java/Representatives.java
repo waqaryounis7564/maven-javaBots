@@ -13,10 +13,6 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Representatives {
     public static void scrapeDAta() throws IOException {
@@ -71,19 +67,37 @@ public class Representatives {
 //                        int end = result.indexOf("]");
                             String pr = result.substring(startIndex, endIndex);
 //                            System.out.println(pr);
-                            String[] anns = pr.split("gfedc");
-                            for (String ann : anns) {
-                                if (ann.contains("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?")) {
-                                    ann = ann.replace("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?", " ");
-
-//                                    int i = ann.indexOf("]");
-//                                    if (i > 0) {
-//
-//                                        System.out.println("Transaction type" + " " + ann.substring(i + 1, i + 3));
-//                                    }
+                            String[] anns1 = pr.split(" ");
+                            int count = 0;
+                            if (pr.contains("gfedc")) {
+                                for (String ann : anns1) {
+                                    if (ann.contains("gfedc")) {
+                                        count++;
+                                    }
+                                }
+                                String[] anns2 = pr.split(" gfedc ", count);
+                                for (String ann : anns2) {
+                                    if (ann.toLowerCase().contains("id owner ") || ann.toLowerCase().startsWith("id owner")) {
+                                        ann = ann.replace("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?", "");
+                                    }
+                                    System.out.println(ann.indexOf("["));
+                                    ;
                                     System.out.println(ann);
                                 }
-                                System.out.println(ann);
+                            } else {
+                                for (String ann : anns1) {
+                                    if (ann.contains("gfedcb")) {
+                                        count++;
+                                    }
+                                }
+                                String[] anns2 = pr.split(" gfedcb ", count);
+                                for (String ann : anns2) {
+                                    if (ann.toLowerCase().contains("id owner ") || ann.toLowerCase().startsWith("id owner")) {
+                                        ann = ann.replace("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?", "");
+                                    }
+                                    System.out.println(ann.indexOf("["));
+                                    System.out.println(ann);
+                                }
                             }
 
                             pdDocument.close();
