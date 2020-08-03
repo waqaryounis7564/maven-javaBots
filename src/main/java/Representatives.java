@@ -5,7 +5,6 @@ import com.gargoylesoftware.htmlunit.WebRequest;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,17 +13,17 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
+import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Representatives {
     public static void scrapeDAta() throws IOException {
         String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 Edg/83.0.478.44";
-        String url = " https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDisclosure/ViewMemberSearchResult";
-        try (final WebClient webClient = new WebClient();) {
+        String url = "https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDisclosure/ViewMemberSearchResult";
+        try (final WebClient webClient = new WebClient()) {
             URL ur = new URL(url);
             WebRequest requestSettings = new WebRequest(ur, HttpMethod.POST);
             requestSettings.setRequestBody("LastName=&FilingYear=2020&State=&District=");
@@ -42,78 +41,106 @@ public class Representatives {
                 String office = row.select("td:nth-child(2)").text();
                 String fillingYear = row.select("td:nth-child(3)").text();
                 String filling = row.select("td:nth-child(4)").text();
-                if (filling.contains("Term. Exemption")) continue;
-                PdfManager pdfManager = new PdfManager();
+                if (filling.contains("Term. Exemption") || filling.contains("Termination")) continue;
 
                 Page pdf = webClient.getPage(pdfUrl);
+                File file = File.createTempFile("theFile", ".pdf");
+
                 if (pdf.getWebResponse().getContentType().equals("application/pdf")) {
-                    System.out.println("Pdf downloaded");
-                    IOUtils.copy(pdf.getWebResponse().getContentAsStream(),
-                            new FileOutputStream("transaction.pdf"));
-                    System.out.println("Pdf file created");
-
+                    try (OutputStream outputStream = new FileOutputStream(file)) {
+                        outputStream.write(IOUtils.toByteArray(pdf.getWebResponse().getContentAsStream()));
+                        outputStream.flush();
+                    }
                 }
-//                pdfManager.setFilePath("transaction.pdf");
-//                try {
-//                    String text = pdfManager.toText();
-//
-//                    System.out.println(text);
-//                } catch (IOException ex) {
-//                    System.out.println(ex.getMessage());
-//                }
-//                try (PDDocument pdDocument = PDDocument.load(new File("transaction.pdf"))) {
-//                    pdDocument.getClass();
-//
-//                    if (!pdDocument.isEncrypted()) {
-//
-//                        PDFTextStripper tStripper = new PDFTextStripper();
-//                       // stripper.setSortByPosition(true);
-//
-//                      //  PDFTextStripper tStripper = new PDFTextStripper();
-//
-//                        String pdfFileInText = tStripper.getText(pdDocument);
-//                        //System.out.println("Text:" + st);
-//
-//                        // split by whitespace
-//                        String[] lines = pdfFileInText.split("\\r?\\n");
-//                        for (String line : lines) {
-//                            System.out.println(line);
-//                        }
-//                    }
-//                }
-//                    PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-//                    stripper.setSortByPosition(true);
-//                    PDFTextStripper tStripper = new PDFTextStripper();
-//                    String stringPdf = tStripper.getText(pdDocument);
-//                    String[] lines = stringPdf.split("\\n");
-//                    String namePattern = "Name:\\s+(.+)";
-//                    String filingPattern="Filing\\sID+(.+)";
-//                    Pattern p = Pattern.compile(filingPattern);
-//                    String price = "";
-//                    for (String line : lines) {
-//                        Matcher m = p.matcher(line);
-//                        if (m.find()) {
-//                            price = m.group(1);
-//                        }
-//                    }
-//                    if (!price.isEmpty()) {
-//                        System.out.println("NAme found: " + price);
-//                    } else {
-//                        System.out.println("Name not found"+" "+pdfUrl);
-//                    }
-//                }
+                try (PDDocument pdDocument = PDDocument.load(file)) {
+                    PDFTextStripper tStripper = new PDFTextStripper();
+                    String stringPdf = tStripper.getText(pdDocument);
+                    String headerLineSplitter = "\\$200\\?";
+                    final String lineSeparator = tStripper.getLineSeparator();
+                    // Below are possible trade separator so far.
+                    String[] tradeSeparators = {
+                            "FIlINg STATuS: New",
+                            "FILINg STATUS: New",
+                            "FILINg STATUS: Amended",
+                            "FIlINg STaTuS: New",
+                            "FILINg STaTUS: New",
+                            "FILING STaTUS: New",
+                            "FILING STATUS: New",
+                            "FIlINg sTaTus: New"};
 
-//                System.out.println(name);
-//                System.out.println(href);
-//                System.out.println(office);
-//                System.out.println(fillingYear);
-//                System.out.println(filling);
-                            System.out.println("---------------------------");
+                    String[] tradeLines = {};
+                    boolean isAmended = false;
+                    for (String sep : tradeSeparators) {
+                        if (stringPdf.contains(sep)) {
+                            if (sep.equals(tradeSeparators[2])) {
+                                isAmended = true;
+                            }
+                            tradeLines = stringPdf.split(sep);
+                            break;
+                        }
+                    }
+                    //TODO If we run this in debug mode and we can any file which says trade lines are less than 1 then
+                    //TODO We can find new trade seperator.
+                    for (String tradeLine : tradeLines) {
+
+                        String finalTradeLine = null;
+
+                        //If trade line is first then skip first 13 lines.
+                        if (tradeLine.equals(tradeLines[0])) {
+                            String[] lines = tradeLine.split(lineSeparator);
+                            if (lines[13].equals("$200?"))
+                                finalTradeLine = String.join("\n", Arrays.copyOfRange(lines, 14, lines.length));
+                            else
+                                finalTradeLine = String.join("\n", Arrays.copyOfRange(lines, 15, lines.length));
+                        } else {
+                            Pattern pattern = Pattern.compile("\\d+");
+                            finalTradeLine = Arrays.stream(tradeLine.split(lineSeparator)).filter(
+                                    l -> !pattern.matcher(l.split(" ")[0]).matches()
+                            ).collect(Collectors.joining(" "));
+                        }
+                        if (finalTradeLine.contains("For the complete"))
+                            continue;
+
+                        if (finalTradeLine.toLowerCase().startsWith("subholding of")) {
+                            continue;
                         }
 
+                        finalTradeLine = finalTradeLine.trim();
+                        //TODO Here we will have trade.
+
+                        String[] tradeSplitter = {"JT\\s", "DC\\s"};
+                        String headerSplitter = "\\s[idIDiD]";
+                        String theRow;
+                        String desc = "";
+                        if (finalTradeLine.split(tradeSplitter[1]).length > 1) {
+                            theRow = finalTradeLine.split(tradeSplitter[1])[1].split(headerSplitter)[0];
+                        } else if (finalTradeLine.split(tradeSplitter[0]).length > 1) {
+                            desc = finalTradeLine.split(tradeSplitter[0])[0].split(headerSplitter)[0];
+                            theRow = finalTradeLine.split(tradeSplitter[0])[1].split(headerSplitter)[0];
+                        } else {
+                            theRow = finalTradeLine.split(headerSplitter)[0];
+                        }
+                        System.out.println(theRow);
 
                     }
                 }
             }
+        }
+    }
+
+    private static boolean isNumber(String value) {
+        if (value == null)
+            return false;
+        try {
+            Long.valueOf(value);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
+    }
+
+
+}
+
 
 
