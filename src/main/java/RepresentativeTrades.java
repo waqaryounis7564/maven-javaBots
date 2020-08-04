@@ -11,9 +11,19 @@ public class RepresentativeTrades {
     private String assetName;
     private String description;
     private String notificationDate;
-    private Boolean gains;
+    private String gains;
     private String status;
     private String sourceUrl;
+
+    public String getFillingId() {
+        return fillingId;
+    }
+
+    public void setFillingId(String fillingId) {
+        this.fillingId = fillingId;
+    }
+
+    private String fillingId;
 
     public String getSourceUrl() {
         return sourceUrl;
@@ -111,11 +121,11 @@ public class RepresentativeTrades {
         this.notificationDate = notificationDate;
     }
 
-    public Boolean getGains() {
+    public String getGains() {
         return gains;
     }
 
-    public void setGains(Boolean gains) {
+    public void setGains(String gains) {
         this.gains = gains;
     }
 

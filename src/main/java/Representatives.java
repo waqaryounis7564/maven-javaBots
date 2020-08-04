@@ -44,6 +44,8 @@ public class Representatives {
                 String office = row.select("td:nth-child(2)").text();
                 String fillingYear = row.select("td:nth-child(3)").text();
                 String filling = row.select("td:nth-child(4)").text();
+                String fillingIdText = pdfUrl.split("/")[7];
+                String fillingId = fillingIdText.substring(0, fillingIdText.length() - 4);
                 if (filling.contains("Term. Exemption") || filling.contains("Termination")) continue;
 
                 Page pdf = webClient.getPage(pdfUrl);
@@ -127,12 +129,41 @@ public class Representatives {
                             theRow = finalTradeLine.split(headerSplitter)[0];
                         }
                         RepresentativeTrades representativeTrades = new RepresentativeTrades();
+                        if (isAmended) {
+                            representativeTrades.setStatus("Amended");
+                        } else representativeTrades.setStatus("New");
+                        representativeTrades.setFillingId(fillingId);
                         representativeTrades.setSourceUrl(pdfUrl);
+                        if (theRow.split("\\ss\\s").length > 1) {
+                            String[] parts = theRow.split("\\ss\\s");
+                            if (parts[1].split("\\s").length < 5) continue;
 
-                        if (theRow.split("\\sP\\s").length > 1) {
+                            representativeTrades.setAssetName(parts[0]);
+                            representativeTrades.setTransactionType("Purchase");
+                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
+                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
+                        } else if (theRow.split("\\ss\\s(partial)\\s").length > 1) {
+                            String[] parts = theRow.split("\\ss\\s(partial)\\s");
+                            if (parts[1].split("\\s").length < 5) continue;
+
+                            representativeTrades.setAssetName(parts[0]);
+                            representativeTrades.setTransactionType("Purchase");
+                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
+                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
+                        } else if (theRow.split("\\sE\\s").length > 1) {
+                            String[] parts = theRow.split("\\sE\\s");
+                            if (parts[1].split("\\s").length < 5) continue;
+
+                            representativeTrades.setAssetName(parts[0]);
+                            representativeTrades.setTransactionType("Purchase");
+                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
+                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
+                        } else if (theRow.split("\\sP\\s").length > 1) {
                             String[] parts = theRow.split("\\sP\\s");
-                            if (parts[1].split("\\s").length < 5)
-                                continue;
+                            if (parts[1].split("\\s").length < 5) continue;
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
@@ -141,17 +172,26 @@ public class Representatives {
                         } else if (theRow.split("\\sS\\s").length > 1) {
                             String[] parts = theRow.split("\\sS\\s");
                             representativeTrades.setAssetName(parts[0]);
-                            if (parts[1].split("\\s").length < 5)
-                                continue;
+                            if (parts[1].split("\\s").length < 5) continue;
                             representativeTrades.setTransactionType("Sales");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
                             representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else {
-                            System.out.println("Line not resolved" + theRow);
+                            System.out.println("Line not resolved" + " " + theRow);
+                            System.out.println(pdfUrl);
                         }
                         representativeTradesList.add(representativeTrades);
+                        System.out.println(representativeTrades.getFillingId());
+                        System.out.println(representativeTrades.getStatus());
+                        System.out.println(representativeTrades.getAssetName());
+                        System.out.println(representativeTrades.getDescription());
+                        System.out.println(representativeTrades.getTransactionType());
+                        System.out.println(representativeTrades.getFilingDate());
+                        System.out.println(representativeTrades.getSourceUrl());
+                        System.out.println(representativeTrades.getGains());
                     }
+                    System.out.println("--------");
                 }
             }
         }
