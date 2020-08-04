@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="untitled" />
         <module name="maven bots" />
+        <module name="bots-demo" />
       </profile>
     </annotationProcessing>
   </component>

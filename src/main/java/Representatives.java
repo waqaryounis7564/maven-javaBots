@@ -131,6 +131,8 @@ public class Representatives {
 
                         if (theRow.split("\\sP\\s").length > 1) {
                             String[] parts = theRow.split("\\sP\\s");
+                            if (parts[1].split("\\s").length < 5)
+                                continue;
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
@@ -139,6 +141,8 @@ public class Representatives {
                         } else if (theRow.split("\\sS\\s").length > 1) {
                             String[] parts = theRow.split("\\sS\\s");
                             representativeTrades.setAssetName(parts[0]);
+                            if (parts[1].split("\\s").length < 5)
+                                continue;
                             representativeTrades.setTransactionType("Sales");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
                             representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
