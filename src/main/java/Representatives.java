@@ -15,7 +15,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ public class Representatives {
     public static void scrapeDAta() throws IOException {
         String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36 Edg/83.0.478.44";
         String url = "https://disclosures-clerk.house.gov/PublicDisclosure/FinancialDisclosure/ViewMemberSearchResult";
+        List<RepresentativeTrades> representativeTradesList = new ArrayList<>();
         try (final WebClient webClient = new WebClient()) {
             URL ur = new URL(url);
             WebRequest requestSettings = new WebRequest(ur, HttpMethod.POST);
@@ -89,13 +92,16 @@ public class Representatives {
                         if (tradeLine.equals(tradeLines[0])) {
                             String[] lines = tradeLine.split(lineSeparator);
                             if (lines[13].equals("$200?"))
-                                finalTradeLine = String.join("\n", Arrays.copyOfRange(lines, 14, lines.length));
+                                finalTradeLine = String.join(" ", Arrays.copyOfRange(lines, 14, lines.length));
                             else
-                                finalTradeLine = String.join("\n", Arrays.copyOfRange(lines, 15, lines.length));
+                                finalTradeLine = String.join(" ", Arrays.copyOfRange(lines, 15, lines.length));
                         } else {
                             Pattern pattern = Pattern.compile("\\d+");
                             finalTradeLine = Arrays.stream(tradeLine.split(lineSeparator)).filter(
-                                    l -> !pattern.matcher(l.split(" ")[0]).matches()
+                                    l -> !l.toLowerCase().startsWith("subholding") &&
+                                            !l.toLowerCase().startsWith("description") &&
+                                            !l.toLowerCase().startsWith("Filing I".toLowerCase()) &&
+                                            !pattern.matcher(l.split(" ")[0]).matches()
                             ).collect(Collectors.joining(" "));
                         }
                         if (finalTradeLine.contains("For the complete"))
@@ -109,7 +115,7 @@ public class Representatives {
                         //TODO Here we will have trade.
 
                         String[] tradeSplitter = {"JT\\s", "DC\\s"};
-                        String headerSplitter = "\\s[idIDiD]";
+                        String headerSplitter = "\\siD";
                         String theRow;
                         String desc = "";
                         if (finalTradeLine.split(tradeSplitter[1]).length > 1) {
@@ -120,12 +126,36 @@ public class Representatives {
                         } else {
                             theRow = finalTradeLine.split(headerSplitter)[0];
                         }
-                        System.out.println(theRow);
+                        RepresentativeTrades representativeTrades = new RepresentativeTrades();
+                        representativeTrades.setSourceUrl(pdfUrl);
 
+                        if (theRow.split("\\sP\\s").length > 1) {
+                            String[] parts = theRow.split("\\sP\\s");
+                            representativeTrades.setAssetName(parts[0]);
+                            representativeTrades.setTransactionType("Purchase");
+                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
+                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
+                        } else if (theRow.split("\\sS\\s").length > 1) {
+                            String[] parts = theRow.split("\\sS\\s");
+                            representativeTrades.setAssetName(parts[0]);
+                            representativeTrades.setTransactionType("Sales");
+                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
+                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
+                        } else {
+                            System.out.println("Line not resolved" + theRow);
+                        }
+                        representativeTradesList.add(representativeTrades);
                     }
                 }
             }
         }
+        saveTheList(representativeTradesList);
+    }
+
+    private static void saveTheList(List<RepresentativeTrades> representativeTradesList) {
+        //TODO Call the method to save the data to DB.
     }
 
     private static boolean isNumber(String value) {

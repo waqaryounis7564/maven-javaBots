@@ -1,18 +1,27 @@
 public class RepresentativeTrades {
 
-    String Id;
-    String name;
-    String transactionDate;
-    String filingDate;
-    String transactionType;
-    String valueRange;
-    String owner;
-    String state;
-    String assetName;
-    String description;
-    String notificationDate;
-    Boolean gains;
-    String status;
+    private String Id;
+    private String name;
+    private String transactionDate;
+    private String filingDate;
+    private String transactionType;
+    private String valueRange;
+    private String owner;
+    private String state;
+    private String assetName;
+    private String description;
+    private String notificationDate;
+    private Boolean gains;
+    private String status;
+    private String sourceUrl;
+
+    public String getSourceUrl() {
+        return sourceUrl;
+    }
+
+    public void setSourceUrl(String sourceUrl) {
+        this.sourceUrl = sourceUrl;
+    }
 
     public String getId() {
         return Id;
