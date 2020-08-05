@@ -178,20 +178,49 @@ public class Representatives {
                             representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else {
-                            System.out.println("Line not resolved" + " " + theRow);
+                            theRow = "Line not resolved" + " " + theRow;
                             System.out.println(pdfUrl);
                         }
+                        String[] gainText;
+                        if (theRow.startsWith("Line")) continue;
+                        else if (theRow.contains("000")) {
+                            gainText = theRow.split("000 ");
+                        } else if (theRow.contains("$767.14")) {
+                            gainText = theRow.split(".14");
+                        } else if (theRow.contains("$770.65")) {
+                            gainText = theRow.split(".65");
+                        } else if (theRow.contains("$592.47")) {
+                            gainText = theRow.split(".47");
+                        } else if (theRow.contains("$348.94")) {
+                            gainText = theRow.split(".94");
+                        } else if (theRow.contains("$570.26")) {
+                            gainText = theRow.split(".26");
+                        } else if (theRow.contains("$721.28")) {
+                            gainText = theRow.split(".28");
+                        } else if (theRow.contains("$24.03")) {
+                            gainText = theRow.split(".03");
+                        } else if (theRow.contains("$456.80 ")) {
+                            gainText = theRow.split(".80");
+                        } else if (theRow.contains("$420.00 ")) {
+                            gainText = theRow.split(".00");
+                        } else if (theRow.contains("$423.87 ")) {
+                            gainText = theRow.split(".87");
+                        } else if (theRow.contains("$325.99 ")) {
+                            gainText = theRow.split(".99");
+                        } else {
+                            gainText = theRow.split("001");
+                        }
+                        String gain = gainText[1].trim();
+                        if (gain.equalsIgnoreCase("gfedcb")) {
+                            representativeTrades.setGains("Yes");
+                        } else representativeTrades.setGains("No");
+
                         representativeTradesList.add(representativeTrades);
-                        System.out.println(representativeTrades.getFillingId());
-                        System.out.println(representativeTrades.getStatus());
-                        System.out.println(representativeTrades.getAssetName());
-                        System.out.println(representativeTrades.getDescription());
-                        System.out.println(representativeTrades.getTransactionType());
-                        System.out.println(representativeTrades.getFilingDate());
+                        System.out.println(theRow);
                         System.out.println(representativeTrades.getSourceUrl());
                         System.out.println(representativeTrades.getGains());
                     }
-                    System.out.println("--------");
+
                 }
             }
         }
