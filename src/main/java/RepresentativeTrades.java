@@ -1,19 +1,26 @@
 public class RepresentativeTrades {
 
-    private String Id;
     private String name;
     private String transactionDate;
-    private String filingDate;
     private String transactionType;
     private String valueRange;
     private String owner;
-    private String state;
+    private String state_district;
     private String assetName;
-    private String description;
     private String notificationDate;
     private String gains;
     private String status;
     private String sourceUrl;
+
+    public String getFillingYear() {
+        return fillingYear;
+    }
+
+    public void setFillingYear(String fillingYear) {
+        this.fillingYear = fillingYear;
+    }
+
+    private String fillingYear;
 
     public String getFillingId() {
         return fillingId;
@@ -33,14 +40,6 @@ public class RepresentativeTrades {
         this.sourceUrl = sourceUrl;
     }
 
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -55,14 +54,6 @@ public class RepresentativeTrades {
 
     public void setTransactionDate(String transactionDate) {
         this.transactionDate = transactionDate;
-    }
-
-    public String getFilingDate() {
-        return filingDate;
-    }
-
-    public void setFilingDate(String filingDate) {
-        this.filingDate = filingDate;
     }
 
     public String getTransactionType() {
@@ -89,12 +80,12 @@ public class RepresentativeTrades {
         this.owner = owner;
     }
 
-    public String getState() {
-        return state;
+    public String getState_district() {
+        return state_district;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setState_district(String state_district) {
+        this.state_district = state_district;
     }
 
     public String getAssetName() {
@@ -103,14 +94,6 @@ public class RepresentativeTrades {
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getNotificationDate() {

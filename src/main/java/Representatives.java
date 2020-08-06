@@ -117,23 +117,34 @@ public class Representatives {
                         //TODO Here we will have trade.
 
                         String[] tradeSplitter = {"JT\\s", "DC\\s"};
+                        String owner;
                         String headerSplitter = "\\siD";
                         String theRow;
-                        String desc = "";
                         if (finalTradeLine.split(tradeSplitter[1]).length > 1) {
                             theRow = finalTradeLine.split(tradeSplitter[1])[1].split(headerSplitter)[0];
+                            owner = "DC";
+
                         } else if (finalTradeLine.split(tradeSplitter[0]).length > 1) {
-                            desc = finalTradeLine.split(tradeSplitter[0])[0].split(headerSplitter)[0];
+//                            desc = finalTradeLine.split(tradeSplitter[0])[0].split(headerSplitter)[0];
+                            owner = "JT";
                             theRow = finalTradeLine.split(tradeSplitter[0])[1].split(headerSplitter)[0];
+
                         } else {
+                            owner = "";
                             theRow = finalTradeLine.split(headerSplitter)[0];
+
                         }
                         RepresentativeTrades representativeTrades = new RepresentativeTrades();
                         if (isAmended) {
                             representativeTrades.setStatus("Amended");
                         } else representativeTrades.setStatus("New");
+
+                        representativeTrades.setOwner(owner);
+                        representativeTrades.setName(name);
                         representativeTrades.setFillingId(fillingId);
                         representativeTrades.setSourceUrl(pdfUrl);
+                        representativeTrades.setFillingYear(fillingYear);
+                        representativeTrades.setState_district(office);
                         if (theRow.split("\\ss\\s").length > 1) {
                             String[] parts = theRow.split("\\ss\\s");
                             if (parts[1].split("\\s").length < 5) continue;
@@ -141,7 +152,7 @@ public class Representatives {
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\ss\\s(partial)\\s").length > 1) {
                             String[] parts = theRow.split("\\ss\\s(partial)\\s");
@@ -150,16 +161,17 @@ public class Representatives {
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\sE\\s").length > 1) {
                             String[] parts = theRow.split("\\sE\\s");
                             if (parts[1].split("\\s").length < 5) continue;
 
+
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\sP\\s").length > 1) {
                             String[] parts = theRow.split("\\sP\\s");
@@ -167,7 +179,7 @@ public class Representatives {
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\sS\\s").length > 1) {
                             String[] parts = theRow.split("\\sS\\s");
@@ -175,7 +187,7 @@ public class Representatives {
                             if (parts[1].split("\\s").length < 5) continue;
                             representativeTrades.setTransactionType("Sales");
                             representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setFilingDate(parts[1].split("\\s")[1]);
+                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else {
                             theRow = "Line not resolved" + " " + theRow;
@@ -216,11 +228,21 @@ public class Representatives {
                         } else representativeTrades.setGains("No");
 
                         representativeTradesList.add(representativeTrades);
-                        System.out.println(theRow);
+                        System.out.println("name:" + representativeTrades.getName());
+                        System.out.println("transactionDate:" + representativeTrades.getTransactionDate());
+                        System.out.println("transactionType:" + representativeTrades.getTransactionType());
+                        System.out.println("range:" + representativeTrades.getValueRange());
+                        System.out.println("owner:" + representativeTrades.getOwner());
+                        System.out.println("state:" + representativeTrades.getState_district());
+                        System.out.println("Asset:" + representativeTrades.getAssetName());
+                        System.out.println("notification date:" + representativeTrades.getNotificationDate());
+                        System.out.println("Gains>200:" + representativeTrades.getGains());
+                        System.out.println("Filling status:" + representativeTrades.getStatus());
+                        System.out.println(representativeTrades.getFillingYear());
                         System.out.println(representativeTrades.getSourceUrl());
-                        System.out.println(representativeTrades.getGains());
+                        System.out.println(representativeTrades.getFillingId());
                     }
-
+                    System.out.println("----------------------------");
                 }
             }
         }
@@ -229,6 +251,12 @@ public class Representatives {
 
     private static void saveTheList(List<RepresentativeTrades> representativeTradesList) {
         //TODO Call the method to save the data to DB.
+        representativeTradesList.forEach(t -> saveToDB(t.getName(), t.getStatus(), t.getSourceUrl()));
+    }
+
+    private static void saveToDB(String a, String b, String c) {
+        System.out.println(a);
+        System.out.println(b);
     }
 
     private static boolean isNumber(String value) {
