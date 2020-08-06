@@ -15,8 +15,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -149,45 +153,70 @@ public class Representatives {
                             String[] parts = theRow.split("\\ss\\s");
                             if (parts[1].split("\\s").length < 5) continue;
 
+//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
+//                            Date notification = validateDate(parts[1].split("\\s")[1]);
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
-                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
+//                            representativeTrades.setTransactionDate(transaction);
+//                            representativeTrades.setNotificationDate(notification);
+                            System.out.println(parts[1].split("\\s")[0]);
+                            System.out.println(parts[1].split("\\s")[1]);
+
+                            System.out.println(pdfUrl);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\ss\\s(partial)\\s").length > 1) {
                             String[] parts = theRow.split("\\ss\\s(partial)\\s");
                             if (parts[1].split("\\s").length < 5) continue;
 
+//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
+//                            Date notification = validateDate(parts[1].split("\\s")[1]);
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
-                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
+//                            representativeTrades.setTransactionDate(transaction);
+//                            representativeTrades.setNotificationDate(notification);
+                            System.out.println(pdfUrl);
+                            System.out.println(parts[1].split("\\s")[0]);
+                            System.out.println(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\sE\\s").length > 1) {
                             String[] parts = theRow.split("\\sE\\s");
                             if (parts[1].split("\\s").length < 5) continue;
-
+//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
+//                            Date notification = validateDate(parts[1].split("\\s")[1]);
 
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
-                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
+//                            representativeTrades.setTransactionDate(transaction);
+//                            representativeTrades.setNotificationDate(notification);
+                            System.out.println(pdfUrl);
+                            System.out.println(parts[1].split("\\s")[0]);
+                            System.out.println(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\sP\\s").length > 1) {
                             String[] parts = theRow.split("\\sP\\s");
                             if (parts[1].split("\\s").length < 5) continue;
+//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
+//                            Date notification = validateDate(parts[1].split("\\s")[1]);
                             representativeTrades.setAssetName(parts[0]);
                             representativeTrades.setTransactionType("Purchase");
-                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
+//                            representativeTrades.setTransactionDate(transaction);
+//                            representativeTrades.setNotificationDate(notification);
+                            System.out.println(pdfUrl);
+                            System.out.println(parts[1].split("\\s")[0]);
+                            System.out.println(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else if (theRow.split("\\sS\\s").length > 1) {
                             String[] parts = theRow.split("\\sS\\s");
                             representativeTrades.setAssetName(parts[0]);
                             if (parts[1].split("\\s").length < 5) continue;
                             representativeTrades.setTransactionType("Sales");
-                            representativeTrades.setTransactionDate(parts[1].split("\\s")[0]);
-                            representativeTrades.setNotificationDate(parts[1].split("\\s")[1]);
+//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
+//                            Date notification = validateDate(parts[1].split("\\s")[1]);
+//                            representativeTrades.setTransactionDate(transaction);
+//                            representativeTrades.setNotificationDate(notification);
+                            System.out.println(pdfUrl);
+                            System.out.println(parts[1].split("\\s")[0]);
+                            System.out.println(parts[1].split("\\s")[1]);
                             representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                         } else {
                             theRow = "Line not resolved" + " " + theRow;
@@ -228,35 +257,43 @@ public class Representatives {
                         } else representativeTrades.setGains("No");
 
                         representativeTradesList.add(representativeTrades);
-                        System.out.println("name:" + representativeTrades.getName());
-                        System.out.println("transactionDate:" + representativeTrades.getTransactionDate());
-                        System.out.println("transactionType:" + representativeTrades.getTransactionType());
-                        System.out.println("range:" + representativeTrades.getValueRange());
-                        System.out.println("owner:" + representativeTrades.getOwner());
-                        System.out.println("state:" + representativeTrades.getState_district());
-                        System.out.println("Asset:" + representativeTrades.getAssetName());
-                        System.out.println("notification date:" + representativeTrades.getNotificationDate());
-                        System.out.println("Gains>200:" + representativeTrades.getGains());
-                        System.out.println("Filling status:" + representativeTrades.getStatus());
-                        System.out.println(representativeTrades.getFillingYear());
-                        System.out.println(representativeTrades.getSourceUrl());
-                        System.out.println(representativeTrades.getFillingId());
+//                        System.out.println("name:" + representativeTrades.getName());
+//                        System.out.println("transactionDate:" + representativeTrades.getTransactionDate());
+//                        System.out.println("transactionType:" + representativeTrades.getTransactionType());
+//                        System.out.println("range:" + representativeTrades.getValueRange());
+//                        System.out.println("owner:" + representativeTrades.getOwner());
+//                        System.out.println("state:" + representativeTrades.getState_district());
+//                        System.out.println("Asset:" + representativeTrades.getAssetName());
+//                        System.out.println("notification date:" + representativeTrades.getNotificationDate());
+//                        System.out.println("Gains>200:" + representativeTrades.getGains());
+//                        System.out.println("Filling status:" + representativeTrades.getStatus());
+//                        System.out.println(representativeTrades.getFillingYear());
+//                        System.out.println(representativeTrades.getSourceUrl());
+//                        System.out.println(representativeTrades.getFillingId());
                     }
                     System.out.println("----------------------------");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
         saveTheList(representativeTradesList);
     }
 
-    private static void saveTheList(List<RepresentativeTrades> representativeTradesList) {
-        //TODO Call the method to save the data to DB.
-        representativeTradesList.forEach(t -> saveToDB(t.getName(), t.getStatus(), t.getSourceUrl()));
+    private static Date validateDate(String inputDate) throws ParseException {
+        DateFormat inputFormat = new SimpleDateFormat("MM/dd/yyyy");
+        return inputFormat.parse(inputDate);
     }
 
-    private static void saveToDB(String a, String b, String c) {
+    private static void saveTheList(List<RepresentativeTrades> representativeTradesList) {
+        //TODO Call the method to save the data to DB.
+        representativeTradesList.forEach(t -> saveToDB(t.getName(), t.getStatus(), t.getTransactionDate()));
+    }
+
+    private static void saveToDB(String a, String b, Date c) {
         System.out.println(a);
         System.out.println(b);
+        System.out.println(c);
     }
 
     private static boolean isNumber(String value) {

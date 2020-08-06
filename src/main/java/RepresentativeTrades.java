@@ -1,13 +1,15 @@
+import java.util.Date;
+
 public class RepresentativeTrades {
 
     private String name;
-    private String transactionDate;
+    private Date transactionDate;
     private String transactionType;
     private String valueRange;
     private String owner;
     private String state_district;
     private String assetName;
-    private String notificationDate;
+    private Date notificationDate;
     private String gains;
     private String status;
     private String sourceUrl;
@@ -48,11 +50,11 @@ public class RepresentativeTrades {
         this.name = name;
     }
 
-    public String getTransactionDate() {
+    public Date getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(String transactionDate) {
+    public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
 
@@ -96,11 +98,11 @@ public class RepresentativeTrades {
         this.assetName = assetName;
     }
 
-    public String getNotificationDate() {
+    public Date getNotificationDate() {
         return notificationDate;
     }
 
-    public void setNotificationDate(String notificationDate) {
+    public void setNotificationDate(Date notificationDate) {
         this.notificationDate = notificationDate;
     }
 
