@@ -8,8 +8,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -119,12 +123,12 @@ public class Ret {
                         String[] parts = theRow.split("\\ss\\s");
                         if (parts[1].split("\\s").length < 5) continue;
 
-//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
-//                            Date notification = validateDate(parts[1].split("\\s")[1]);
+                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
+                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
-//                            representativeTrades.setTransactionDate(transaction);
-//                            representativeTrades.setNotificationDate(notification);
+                        representativeTrades.setTransactionDate(transaction);
+                        representativeTrades.setNotificationDate(notification);
                         String tr = parts[1].split("\\s")[0];
                         String no = parts[1].split("\\s")[1];
                         String na = "waq";
@@ -135,12 +139,12 @@ public class Ret {
                         String[] parts = theRow.split("\\ss\\s(partial)\\s");
                         if (parts[1].split("\\s").length < 5) continue;
 
-//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
-//                            Date notification = validateDate(parts[1].split("\\s")[1]);
+                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
+                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
-//                            representativeTrades.setTransactionDate(transaction);
-//                            representativeTrades.setNotificationDate(notification);
+                        representativeTrades.setTransactionDate(transaction);
+                        representativeTrades.setNotificationDate(notification);
                         String tr = parts[1].split("\\s")[0];
                         String no = parts[1].split("\\s")[1];
                         String na = "waq";
@@ -148,13 +152,13 @@ public class Ret {
                     } else if (theRow.split("\\sE\\s").length > 1) {
                         String[] parts = theRow.split("\\sE\\s");
                         if (parts[1].split("\\s").length < 5) continue;
-//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
-//                            Date notification = validateDate(parts[1].split("\\s")[1]);
+                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
+                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
 
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
-//                            representativeTrades.setTransactionDate(transaction);
-//                            representativeTrades.setNotificationDate(notification);
+                        representativeTrades.setTransactionDate(transaction);
+                        representativeTrades.setNotificationDate(notification);
 
                         String tr = parts[1].split("\\s")[0];
                         String no = parts[1].split("\\s")[1];
@@ -163,12 +167,12 @@ public class Ret {
                     } else if (theRow.split("\\sP\\s").length > 1) {
                         String[] parts = theRow.split("\\sP\\s");
                         if (parts[1].split("\\s").length < 5) continue;
-//                            Date transaction = validateDate(parts[1].split("\\s")[0]);
-//                            Date notification = validateDate(parts[1].split("\\s")[1]);
+                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
+                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
-//                            representativeTrades.setTransactionDate(transaction);
-//                            representativeTrades.setNotificationDate(notification);
+                        representativeTrades.setTransactionDate(transaction);
+                        representativeTrades.setNotificationDate(notification);
 
                         String tr = parts[1].split("\\s")[0];
                         String no = parts[1].split("\\s")[1];
@@ -241,6 +245,28 @@ public class Ret {
             return false;
         }
         return true;
+    }
+
+    private static Date validateDate(String date, String thisFormat) {
+        String requiredFormat = "yyyy-MM-dd";
+        if (date.contains(")")) {
+            if (date.split("\\)")[1].trim().length() == thisFormat.length()) {
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(thisFormat);
+                    formatter.parse(date.split("\\)")[1].trim());
+                    return new SimpleDateFormat(thisFormat).parse(date.split("\\)")[1].trim());
+                } catch (ParseException ignore) {
+                }
+            }
+            return null;
+        }
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(thisFormat);
+            formatter.parse(date.trim());
+            return new SimpleDateFormat(thisFormat).parse(date.trim());
+        } catch (ParseException ignore) {
+            return null;
+        }
     }
 }
 
