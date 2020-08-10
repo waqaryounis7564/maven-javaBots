@@ -123,8 +123,10 @@ public class Ret {
                         String[] parts = theRow.split("\\ss\\s");
                         if (parts[1].split("\\s").length < 5) continue;
 
-                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
-                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
+                        ;
+
+                        Date transaction = validateDate(getTransactionDate(parts), "MM/dd/yyyy");
+                        Date notification = validateDate(getNotificationDate(parts), "MM/dd/yyyy");
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
                         representativeTrades.setTransactionDate(transaction);
@@ -139,43 +141,43 @@ public class Ret {
                         String[] parts = theRow.split("\\ss\\s(partial)\\s");
                         if (parts[1].split("\\s").length < 5) continue;
 
-                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
-                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
+                        Date transaction = validateDate(getTransactionDate(parts), "MM/dd/yyyy");
+                        Date notification = validateDate(getNotificationDate(parts), "MM/dd/yyyy");
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
                         representativeTrades.setTransactionDate(transaction);
                         representativeTrades.setNotificationDate(notification);
-                        String tr = parts[1].split("\\s")[0];
-                        String no = parts[1].split("\\s")[1];
+                        String tr = getTransactionDate(parts);
+                        String no = getNotificationDate(parts);
                         String na = "waq";
                         representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                     } else if (theRow.split("\\sE\\s").length > 1) {
                         String[] parts = theRow.split("\\sE\\s");
                         if (parts[1].split("\\s").length < 5) continue;
-                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
-                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
+                        Date transaction = validateDate(getTransactionDate(parts), "MM/dd/yyyy");
+                        Date notification = validateDate(getNotificationDate(parts), "MM/dd/yyyy");
 
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
                         representativeTrades.setTransactionDate(transaction);
                         representativeTrades.setNotificationDate(notification);
 
-                        String tr = parts[1].split("\\s")[0];
-                        String no = parts[1].split("\\s")[1];
+                        String tr = getTransactionDate(parts);
+                        String no = getNotificationDate(parts);
                         String na = "waq";
                         representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                     } else if (theRow.split("\\sP\\s").length > 1) {
                         String[] parts = theRow.split("\\sP\\s");
                         if (parts[1].split("\\s").length < 5) continue;
-                        Date transaction = validateDate(parts[1].split("\\s")[0], "MM/dd/yyyy");
-                        Date notification = validateDate(parts[1].split("\\s")[1], "MM/dd/yyyy");
+                        Date transaction = validateDate(getTransactionDate(parts), "MM/dd/yyyy");
+                        Date notification = validateDate(getNotificationDate(parts), "MM/dd/yyyy");
                         representativeTrades.setAssetName(parts[0]);
                         representativeTrades.setTransactionType("Purchase");
                         representativeTrades.setTransactionDate(transaction);
                         representativeTrades.setNotificationDate(notification);
 
-                        String tr = parts[1].split("\\s")[0];
-                        String no = parts[1].split("\\s")[1];
+                        String tr = getTransactionDate(parts);
+                        String no = getNotificationDate(parts);
                         String na = "waq";
                         representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                     } else if (theRow.split("\\sS\\s").length > 1) {
@@ -183,8 +185,8 @@ public class Ret {
                         representativeTrades.setAssetName(parts[0]);
                         if (parts[1].split("\\s").length < 5) continue;
                         representativeTrades.setTransactionType("Sales");
-                        String tr = parts[1].split("\\s")[0];
-                        String no = parts[1].split("\\s")[1];
+                        String tr = getTransactionDate(parts);
+                        String no = getNotificationDate(parts);
                         String na = "waq";
                         representativeTrades.setValueRange(parts[1].split("\\s")[2] + " - " + parts[1].split("\\s")[4]);
                     } else {
@@ -233,6 +235,18 @@ public class Ret {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static String getTransactionDate(String[] parts) {
+        if (parts[1].split("\\s")[0].equals("(partial)"))
+            return parts[1].split("\\s")[1];
+        return parts[1].split("\\s")[0];
+    }
+
+    private static String getNotificationDate(String[] parts) {
+        if (parts[1].split("\\s")[0].equals("(partial)"))
+            return parts[1].split("\\s")[2];
+        return parts[1].split("\\s")[1];
     }
 
 
