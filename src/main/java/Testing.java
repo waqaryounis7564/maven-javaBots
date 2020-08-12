@@ -1,3 +1,6 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,32 +12,25 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Testing {
-public static void  scrapeData() throws ParseException {
+public static void  scrapeData()  {
+String div1="<table><tbody> <tr><td> Pharma Partners, LLC\n" +
+        "                                                <div class=\"text-muted\">\n" +
+        "                                                    <em>Company:</em> Pharma Partners, LLC\n" +
+        "                                                        &nbsp;(Englewood, CO)\n" +
+        "                                                </div>\n" +
+        "                                                <div class=\"text-muted\"><em>Description:</em>&nbsp;The LLC funds research and clinical trials on a new class of drugs, metalloporphyrins. The lead drugs are BMX-010 and BMX-001.</div>                                 \n" +
+        "                                    </td> </tr> </tbody> </table>";
 
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-    Date dat = new Date();
-    String todate = dateFormat.format(dat);
-
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DATE, -4);
-    Date todate1 = cal.getTime();
-    String fromdate = dateFormat.format(todate1);
-
-
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-    Date startDate = formatter.parse(fromdate);
-    Date endDate = formatter.parse(todate);
-//    Here's the legacy java.util.Calendar approach in case you aren't on Java8 yet:
-
-    Calendar start = Calendar.getInstance();
-    start.setTime(startDate);
-    Calendar end = Calendar.getInstance();
-    end.setTime(endDate);
-
-    for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
-        // Do your job here with `date`.
-        System.out.println(date);
-    }
+String div2="<table> <tbody><tr><td>\n" +
+        "                                        \n" +
+        "                                            E. I. du Pont de Nemours and Company (Exchanged)\n" +
+        "                                            <br>\n" +
+        "                                            DowDuPont Inc. (Received)\n" +
+        "                                        \n" +
+        "                                        \n" +
+        "                                        \n" +
+        "                                    </td></tr></tbody></table>";
+Document doc = Jsoup.parse(div2);
+    System.out.println(doc.select("td").text());
 }
 }

@@ -9,8 +9,8 @@ public class Main {
         //SenatorsNetWorth.scrapeData();
         //  SenatorBioDesc.Scrap();
         // GB_Bot.scrapeData();
-         Representatives.scrapeDAta();
-//        Testing.scrapeData();
+//         Representatives.scrapeDAta();
+        Testing.scrapeData();
         //SenatorsData.scrapeData();
     }
 }
