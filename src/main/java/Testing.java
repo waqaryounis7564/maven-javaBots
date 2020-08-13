@@ -31,7 +31,9 @@ public class Testing {
             senators.add(senator);
 
         }
-senators.forEach(t-> System.out.println(t.getName()));
+        Document document1=Jsoup.connect("https://bioguideretro.congress.gov/Home/MemberDetails?memIndex=A000368").get();
+        System.out.println(document1.select("biography").text());
+//senators.forEach(t-> System.out.println(t.getName()));
 
     }
 }
