@@ -28,12 +28,23 @@ public class Testing {
             String id = li.attr("href").split("/")[5];
             senator.setName(name);
             senator.setUrl(url + id);
+//            setBio(senator,senator.getUrl());
             senators.add(senator);
 
         }
-        Document document1=Jsoup.connect("https://bioguideretro.congress.gov/Home/MemberDetails?memIndex=A000368").get();
-        System.out.println(document1.select("biography").text());
-//senators.forEach(t-> System.out.println(t.getName()));
+senators.forEach(t-> {
+    try {
+        setBio(t,t.getUrl());
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+});
+
+    }
+    private static void setBio(Senator senator, String url) throws IOException {
+        Document document1=Jsoup.connect(url).get();
+        String p=document1.select("biography").text();
+        senator.setBioGraphy(p);
 
     }
 }

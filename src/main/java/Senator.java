@@ -1,6 +1,18 @@
+import sun.text.normalizer.Trie;
+
 public class Senator {
     private String name;
     private String url;
+    private String bioGraphy;
+
+    public String getBioGraphy() {
+        return bioGraphy;
+    }
+
+    public void setBioGraphy(String bioGraphy) {
+        this.bioGraphy = bioGraphy;
+    }
+
 
     public String getUrl() {
         return url;
