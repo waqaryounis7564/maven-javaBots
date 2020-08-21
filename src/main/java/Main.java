@@ -10,7 +10,11 @@ public class Main {
         //  SenatorBioDesc.Scrap();
         // GB_Bot.scrapeData();
 //         Representatives.scrapeDAta();
-        Testing.scrapeData();
+//        Testing.scrapeData();
         //SenatorsData.scrapeData();
+//        SouthKorea.scrapeData();
+        Germany.scrape();
+//    KR.scrapeData();
+
     }
 }
