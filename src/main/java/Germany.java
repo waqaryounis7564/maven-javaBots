@@ -47,7 +47,7 @@ public class Germany {
             System.out.println("cc :"+ rowDiv.asXml());
             System.out.println("--------------------");
             System.out.println(document.select("table"));
-
+// 40 is hard coded ** we get total page multiply it with 20 to get total anns for loop
            for(int i=0;i<40;i++){
                List<Object> nxtBtn = result.getByXPath("/html/body/div[1]/section/div/div/div/div/div[1]/div[3]/a");
 
