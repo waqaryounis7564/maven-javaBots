@@ -30,51 +30,39 @@ public class Germany {
             DomElement searchBtn = mainPage3.getElementByName("search-button");
 //           System.out.println(bb.);
             HtmlPage annsPage1 = searchBtn.click();
-//            System.out.println(annsPage.asXml());
+//           System.out.println(annsPage1.asXml());
+            List<Object> pageCount = annsPage1.getByXPath("/html/body/div[1]/section[2]/div/div/div/div/div[5]/div[1]/span");
+            DomElement annsPage = (DomElement) pageCount.get(0);
+            int totalPages = Integer.parseInt(Jsoup.parse(annsPage.asXml()).text());
+            int annsNumer = 20;
+            int totalIteration = totalPages * annsNumer;
 
             List<Object> firstAnn = annsPage1.getByXPath("/html/body/div[1]/section[2]/div/div/div/div/div[6]/div[2]/div[3]/div/a");
 //
 //
             DomElement firstAnchor = (DomElement) firstAnn.get(0);
             HtmlPage result = firstAnchor.click();
-            //todo handle scenrio when anns of that day is not upload and get not found Error in german.
-
+//            //todo handle scenrio when anns of that day is not upload and get not found Error in german.
+//
             Document document = Jsoup.parse(result.asXml());
             List<Object> tb = result.getByXPath("/html/body/div[1]/section/div/div/div/div/div[2]/div[2]");
 
             DomElement rowDiv = (DomElement) tb.get(0);
 
-            System.out.println("cc :"+ rowDiv.asXml());
+            System.out.println("cc :" + rowDiv.asXml());
             System.out.println("--------------------");
             System.out.println(document.select("table"));
-// 40 is hard coded ** we get total page multiply it with 20 to get total anns for loop
-           for(int i=0;i<40;i++){
-               List<Object> nxtBtn = result.getByXPath("/html/body/div[1]/section/div/div/div/div/div[1]/div[3]/a");
+            for (int i = 1; i < totalIteration; i++) {
+                List<Object> nxtBtn = result.getByXPath("/html/body/div[1]/section/div/div/div/div/div[1]/div[3]/a");
 
-               DomElement btn = (DomElement) nxtBtn.get(0);
-               HtmlPage newResultPg = btn.click();
-               Document doc = Jsoup.parse(newResultPg.asXml());
-               System.out.println(doc.select("table"));
-               System.out.println("*****************************");
-               result= newResultPg;
-           }
+                DomElement btn = (DomElement) nxtBtn.get(0);
+                HtmlPage newResultPg = btn.click();
+                Document doc = Jsoup.parse(newResultPg.asXml());
+                System.out.println(doc.select("table"));
+                System.out.println("*****************************");
+                result = newResultPg;
+            }
 
-
-
-
-
-//            HtmlPage result=ko.click();
-//            System.out.println(result.asXml());
-            //            HtmlPage jo = ko.click();
-//            System.out.println(jo.asXml());
-//            DomElement btn = pg.querySelector("#area7 > div > div > div > div:nth-child(7) > label > font > font");
-//            System.out.println(btn);
-//            btn.setNodeValue("Capital market / short sales");
-//            DomElement np = pg.querySelector("#id299");
-//            HtmlPage nh = np.click();
-
-
-//            System.out.println(nh.asXml());
         }
     }
 }
