@@ -2,6 +2,7 @@ import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,6 +15,27 @@ import java.net.URL;
 
 public class SG {
     public static void scrape() throws IOException {
+        String res=download();
+        JSONObject obj=new JSONObject(res);
+        JSONArray jsonArray=obj.getJSONArray("data");
+       for(int i=0;i<jsonArray.length();i++){
+        String headline=jsonArray.getJSONObject(i).getString("title");
+        String srcUrl=jsonArray.getJSONObject(i).getString("url");
+        String date=jsonArray.getJSONObject(i).getString("submission_date");
+        String rnsId=jsonArray.getJSONObject(i).getString("id");
+        String company=jsonArray.getJSONObject(i).getJSONArray("issuers").getJSONObject(0).getString("issuer_name");
+
+           System.out.println(headline);
+           System.out.println(rnsId);
+           System.out.println(company);
+           System.out.println(srcUrl);
+           System.out.println(date);
+           System.out.println("----------");
+       }
+
+
+    }
+    private static String download() throws IOException {
 
         String url = "https://api.sgx.com/announcements/v1.1/?periodstart=20200725_160000&periodend=20200826_155959&cat=ANNC&sub=ANNC13&pagestart=0&pagesize=20";
         URL obj = new URL(url);
@@ -26,10 +48,11 @@ public class SG {
         String inputLine;
         StringBuffer response = new StringBuffer();
         while ((inputLine = in.readLine()) != null) {
-            System.out.println(inputLine);
+            response.append(inputLine);
+
         }
-        response.append(inputLine);
         in.close();
+        return response.toString();
     }
 }
 
