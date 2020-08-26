@@ -16,6 +16,7 @@ public class Main {
 //        Germany.scrape();
 //        SG.scrape();
 //    KR.scrapeData();
-        HK.scrape();
+//        HK.scrape();
+    SG.scrape();
     }
 }
