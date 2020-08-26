@@ -47,6 +47,11 @@ public class Germany {
             Document document = Jsoup.parse(result.asXml());
             List<Object> tb = result.getByXPath("/html/body/div[1]/section/div/div/div/div/div[2]/div[2]");
 
+            if (tb.size() < 1) {
+                System.out.println("List empty -- ERROR");
+                return;
+            }
+
             DomElement rowDiv = (DomElement) tb.get(0);
 
             System.out.println("cc :" + rowDiv.asXml());

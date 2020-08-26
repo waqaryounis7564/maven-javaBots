@@ -13,8 +13,9 @@ public class Main {
 //        Testing.scrapeData();
         //SenatorsData.scrapeData();
 //        SouthKorea.scrapeData();
-        Germany.scrape();
+//        Germany.scrape();
+//        SG.scrape();
 //    KR.scrapeData();
-
+        HK.scrape();
     }
 }
