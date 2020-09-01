@@ -17,7 +17,10 @@ import java.util.Date;
 import java.util.List;
 
 public class HK {
+    private static int count = 0;
+
     public static void scrape() throws IOException {
+
         String url = "https://www.sfc.hk/web/EN/regulatory-functions/market-infrastructure-and-trading/short-position-reporting/aggregated-short-positions-of-specified-shares.html";
         List<String> urls = new ArrayList<>();
         Document document = Jsoup.connect(url).get();
@@ -34,6 +37,7 @@ public class HK {
                 e.printStackTrace();
             }
         });
+        System.out.println("total number of counts are : "+ count);
     }
 
     private static void downloadPage(String link) throws IOException {
@@ -47,11 +51,11 @@ public class HK {
                             line = bufferedReader.readLine();
                             continue;
                         }
-                        consumeLine(line);
+                        System.out.println(line);
+//
+//                        consumeLine(line);
                         line = bufferedReader.readLine();
                     }
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -77,6 +81,7 @@ public class HK {
         disclosure.setAggregatedShortedShares(anns[3]);
         disclosure.setValueOfShortedShares(anns[4]);
         System.out.println(disclosure.getDate());
+        count++;
 
         // call db
         System.out.println("*************");
