@@ -51,11 +51,13 @@ public class HK {
                             line = bufferedReader.readLine();
                             continue;
                         }
-                        System.out.println(line);
-//
-//                        consumeLine(line);
+//                        System.out.println(line);
+
+                        consumeLine(line);
                         line = bufferedReader.readLine();
                     }
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         }
