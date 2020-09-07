@@ -14,13 +14,13 @@ public class Main {
         //SenatorsData.scrapeData();
 //        SouthKorea.scrapeData();
 //        Germany.scrape();
-//        SG.scrape();
+       SG.scrape();
 //    KR.scrapeData();
 //        HK.scrape();
 //
 //        Header.scrape();
 //    HK.scrape();
-    AUS.scrapeDate();
+//    AUS.scrapeDate();
     }
 
 }
