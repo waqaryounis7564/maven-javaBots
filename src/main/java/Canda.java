@@ -20,13 +20,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Canda {
 
-    public static void scrap() {
+    public static void scrap() throws IOException {
         String url = "https://www.iiroc.ca/news/Pages/Short-Sale.aspx";
         List<String> historicalUrls = new ArrayList<>(Arrays.asList(
                 "/Documents/2020/2d243746-e993-4711-aba0-31ca02c1e284_en.csv",
@@ -94,25 +96,46 @@ public class Canda {
             webClient.getOptions().setThrowExceptionOnScriptError(false);
             HtmlPage mainPage = webClient.getPage(requestSettings);
             Document document = Jsoup.parse(mainPage.asXml());
-            Elements tbody = document.select("#WebPartWPQ2 > table:nth-child(1) > tbody>tr>td>a");
-            int i;
-            for (i = 0; i < tbody.size(); i = i + 2) {
-                historicalUrls.add(tbody.get(i).attr("href"));
-            }
-            String link = "https://www.iiroc.ca";
-            historicalUrls.forEach(hr-> {
-                try {
-                    downloadUrl("https://www.iiroc.ca"+hr);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            Elements tbody = document.select("#WebPartWPQ2 > table:nth-child(1) > tbody >tr >" +
+                    "td:nth-child(1),#WebPartWPQ2 > table:nth-child(1) > tbody >tr >td:nth-child(2)");
 
-        } catch (
-                IOException e) {
-            e.printStackTrace();
+            String[] rr = String.valueOf(tbody).split("</td>");
+            for (String line : rr) {
+                if (getDate(line) == null) {
+                    String href = getUrl(line);
+                    System.out.println(href);
+                } else {
+                   String  date =getDate(line);
+                    System.out.println(date);
+                }
+            }
+
         }
 
+
+    }
+
+
+    private static String getUrl(String td) {
+        Pattern pattern = Pattern.compile("<a\\s+(?:[^>]*?\\s+)?href=([\"'])(.*?)\\1");
+        Matcher matcher = pattern.matcher(td);
+        String url = null;
+        if (matcher.find()) {
+            url = matcher.group(2);
+
+        }
+        return url;
+    }
+
+    private static String getDate(String td) {
+        Pattern pattern = Pattern.compile("\\d{1,2}\\/\\d{1,2}\\/\\d{4}");
+        Matcher matcher = pattern.matcher(td);
+        String date = null;
+        if (matcher.find()) {
+            date = matcher.group();
+
+        }
+        return date;
     }
 
     private static void downloadUrl(String link) throws IOException {
