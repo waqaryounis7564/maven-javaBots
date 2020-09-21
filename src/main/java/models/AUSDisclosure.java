@@ -1,3 +1,5 @@
+package models;
+
 public class AUSDisclosure {
     public String getUrl() {
         return url;

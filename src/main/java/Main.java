@@ -1,3 +1,5 @@
+import services.Korea;
+
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -9,18 +11,19 @@ public class Main {
         //SenatorsNetWorth.scrapeData();
         //  SenatorBioDesc.Scrap();
         // GB_Bot.scrapeData();
-//         Representatives.scrapeDAta();
+//        services.Representatives.scrapeDAta();
 //        Testing.scrapeData();
         //SenatorsData.scrapeData();
-//        SouthKorea.scrapeData();
-//        Germany.scrape();
-//       SG.scrape();
-//    KR.scrapeData();
-//        HK.scrape();
+//        services.SouthKorea.scrapeData();
+//        services.Germany.scrape();
+//       services.SG.scrape();
+//    services.KR.scrapeData();
+//        services.HK.scrape();
 //
-//        Header.scrape();
-//    HK.scrape();
-//    AUS.scrapeDate();
-        Canda.scrap();
+//        services.Header.scrape();
+//    services.HK.scrape();
+//    services.AUS.scrapeDate();
+//        services.Canda.scrap();
+        Korea.scrapeData();
     }
 }

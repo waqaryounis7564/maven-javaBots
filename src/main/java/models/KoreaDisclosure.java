@@ -1,3 +1,5 @@
+package models;
+
 public class KoreaDisclosure {
     private String   dateTime;
     private String companyName;

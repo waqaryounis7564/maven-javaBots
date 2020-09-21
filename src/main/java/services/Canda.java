@@ -1,25 +1,21 @@
+package services;
+
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
-import com.gargoylesoftware.htmlunit.html.HtmlImage;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import models.CanadaDisclosure;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.w3c.dom.html.HTMLObjectElement;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,7 +25,7 @@ import java.util.regex.Pattern;
 public class Canda {
 
     public static void scrap() throws IOException {
-        List<CanadaData> historicalData = new ArrayList<>();
+//        List<CanadaData> historicalData = new ArrayList<>();
         String url = "https://www.iiroc.ca/news/Pages/Short-Sale.aspx";
         Map<String, String> urls = new HashMap<String, String>() {{
             put("4/1/2020", "/Documents/2020/2d243746-e993-4711-aba0-31ca02c1e284_en.csv");
@@ -87,14 +83,7 @@ public class Canda {
             put("2/1/2018", "/Documents/2018/c88d8e3d-aaf0-415a-b233-613fa174a4d5_en.csv");
             put("1/16/2018", "/Documents/2018/8e4a7a8b-0a37-497d-b97e-fb41bfd76f36_en.csv");
         }};
-        for (Map.Entry<String, String> entry : urls.entrySet()) {
-            CanadaData data = new CanadaData();
-            data.setDate(entry.getKey());
-            data.setUrl(entry.getValue());
-            historicalData.add(data);
-        }
 
-//historicalData.forEach(t-> System.out.println(t.getDate() + " : " +t.getUrl()));
         try (WebClient webClient = new WebClient()) {
             URL ur = new URL(url);
             WebRequest requestSettings = new WebRequest(ur, HttpMethod.POST);
@@ -105,47 +94,16 @@ public class Canda {
             Document document = Jsoup.parse(mainPage.asXml());
             Elements tbody = document.select("#WebPartWPQ2 > table:nth-child(1) > tbody >tr >" +
                     "td:nth-child(1),#WebPartWPQ2 > table:nth-child(1) > tbody >tr >td:nth-child(2)");
-//            System.out.println(tbody);
             String[] rows = String.valueOf(tbody).split("</td>");
             for (int i = 0; i < rows.length - 1; ) {
                 urls.put(getDate(rows[i++]), getUrl(rows[i++]));
             }
-//            for (Map.Entry<String, String> entry : historicalData.entrySet()) {
-////                downloadUrl(entry.getKey(), "https://www.iiroc.ca" + entry.getValue());
-//                System.out.println("Key = " + getDate(entry.getKey()) + ", Value = " + getUrl(entry.getValue()));
-//            }
-
-//            int j=1;
-//            for (int i=0;i<rr.length;i++){
-//                if(j==20){
-//                    j=19;
-//                }
-//                urls.put(rr[i],rr[j]);
-//                j++;
-//            }
 
             for (Map.Entry<String, String> entry : urls.entrySet()) {
                 downloadUrl(entry.getKey(), "https://www.iiroc.ca" + entry.getValue());
-//                System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
             }
 
-//            for (String line : rr) {
-//                System.out.println(line);
-//                CanadaData data=new CanadaData();
-//                if (getDate(line) == null) {
-//                    String href = getUrl(line);
-//
-//                    System.out.println(href);
-//                    //                    data.setUrl(href);
-//                } else {
-//                   String  date =getDate(line);
-//                    System.out.println(date);
-////                    data.setDate(date);
-//                }
-//
-//            }
 
-//
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -189,7 +147,6 @@ public class Canda {
                     String line = bufferedReader.readLine();
                     while (line != null) {
                         processCsvLine(date, link, line);
-                        ;
                         line = bufferedReader.readLine();
                     }
                 }
@@ -205,15 +162,21 @@ public class Canda {
         Date parseDate = sdf1.parse(date);
 
 
-        disclosure.setReporting_date(sdf2.format(parseDate));
-        disclosure.setTicker(anns[0]);
-        disclosure.setIssuer_name(anns[1]);
-        disclosure.setMarket(anns[2]);
-        disclosure.setShort_selling_volume(anns[3]);
-        disclosure.setPercent_of_total_traded_volume(anns[4]);
-        disclosure.setShort_sell_traded_value(anns[5]);
-        disclosure.setPercent_of_total_traded_value(anns[6]);
-        disclosure.setUrl(url);
+        try {
+            disclosure.setTicker(anns[0]);
+            disclosure.setIssuer_name(anns[1].replace("\"", ""));
+            disclosure.setMarket(anns[2].replace("\"", ""));
+            disclosure.setShort_sale_trades(Long.parseLong(anns[3]));
+            disclosure.setPercent_of_total_trades(new BigDecimal(anns[4]));
+            disclosure.setShort_selling_volume(Long.parseLong(anns[5]));
+            disclosure.setPercent_of_total_traded_volume(new BigDecimal(anns[6]));
+            disclosure.setShort_sell_traded_value(Long.parseLong(anns[7]));
+            disclosure.setPercent_of_total_traded_value(new BigDecimal(anns[8]));
+            disclosure.setUrl(url);
+        } catch (NumberFormatException ex) {
+//            logger.info(ex.getMessage());
+            return;
+        }
         System.out.println(disclosure.getReporting_date());
         System.out.println(disclosure.getTicker());
         System.out.println(disclosure.getIssuer_name());

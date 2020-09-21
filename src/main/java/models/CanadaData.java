@@ -1,3 +1,5 @@
+package models;
+
 public class CanadaData {
     private String date;
     private String url;

@@ -1,3 +1,5 @@
+package services;
+
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -40,10 +42,10 @@ public class Representatives {
 
                 Page pdf = webClient.getPage(pdfUrl);
                 if (pdf.getWebResponse().getContentType().equals("application/pdf")) {
-                    System.out.println("Pdf downloaded");
+//                    System.out.println("Pdf downloaded");
                     IOUtils.copy(pdf.getWebResponse().getContentAsStream(),
                             new FileOutputStream("transaction.pdf"));
-                    System.out.println("Pdf file created");
+//                    System.out.println("Pdf file created");
                 }
 
                 try (PDDocument pdDocument = PDDocument.load(new File("transaction.pdf"))) {
@@ -80,7 +82,7 @@ public class Representatives {
                                     if (ann.toLowerCase().contains("id owner ") || ann.toLowerCase().startsWith("id owner")) {
                                         ann = ann.replace("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?", "");
                                     }
-                                    System.out.println(ann.indexOf("["));
+//                                    System.out.println(ann.indexOf("["));
                                     ;
                                     System.out.println(ann);
                                 }
@@ -95,7 +97,7 @@ public class Representatives {
                                     if (ann.toLowerCase().contains("id owner ") || ann.toLowerCase().startsWith("id owner")) {
                                         ann = ann.replace("ID Owner Asset Transaction Type Date Notification Date Amount Cap. Gains > $200?", "");
                                     }
-                                    System.out.println(ann.indexOf("["));
+//                                    System.out.println(ann.indexOf("["));
                                     System.out.println(ann);
                                 }
                             }

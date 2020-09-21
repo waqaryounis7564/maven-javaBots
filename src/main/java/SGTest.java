@@ -2,7 +2,7 @@
 //
 //import com.google.gson.Gson;
 //import com.x2iq.sbb.bots.repo.BotsRepo;
-//import com.x2iq.sbb.common.ParameterUtils;
+//import com.x2iq.sbb.common.utils.ParameterUtils;
 //import com.x2iq.sbb.common.RequestSetter;
 //import org.json.JSONArray;
 //import org.json.JSONObject;
@@ -92,9 +92,9 @@
 //            strCompany = jsonArray.getJSONObject(i).getJSONArray("issuers").getJSONObject(0).getString("issuer_name");
 //
 //            try {
-//                strDate = ParameterUtils.getDateInStringFromDate(new SimpleDateFormat("yyyyMMdd").parse(strDate));
+//                strDate = utils.ParameterUtils.getDateInStringFromDate(new SimpleDateFormat("yyyyMMdd").parse(strDate));
 //            } catch (ParseException e) {
-//                strDate = ParameterUtils.getDateInStringFromDate(new Date());
+//                strDate = utils.ParameterUtils.getDateInStringFromDate(new Date());
 //            }
 //            if (!botsRepo.checkIsRnsAlreadyExist(rnsId, countryId)) {
 //                botsRepo.insertAnnouncement(strHeadline, strDate, 14, 3, strSourceurl, countryId, strCompany, rnsId);

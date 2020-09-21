@@ -1,3 +1,5 @@
+package models;
+
 public class Disclosure {
     private String date;
     private int stockNumber;
