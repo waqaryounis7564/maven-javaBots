@@ -59,7 +59,16 @@
 <!--            <artifactId>httpcore</artifactId>-->
 <!--            <version>4.4.13</version>-->
 <!--        </dependency>-->
-
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>onnxruntime-platform</artifactId>
+            <version>1.2.0-1.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-ocr</artifactId>
+            <version>20.5</version>
+        </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
@@ -71,9 +80,18 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>3.2.1</version>
+        </dependency>
 
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>aspose-maven-repository</id>
+            <url>http://repository.aspose.com/repo/</url>
+        </repository>
+    </repositories>
 
 </project>

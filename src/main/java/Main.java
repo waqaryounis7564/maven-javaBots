@@ -1,4 +1,6 @@
 import services.Korea;
+import services.Otc_USA;
+import services.Singapur;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -24,6 +26,8 @@ public class Main {
 //    services.HK.scrape();
 //    services.AUS.scrapeDate();
 //        services.Canda.scrap();
-        Korea.scrapeData();
+//        Korea.scrapeData();
+//        Singapur.scrape();
+        Otc_USA.scrapeData();
     }
 }
