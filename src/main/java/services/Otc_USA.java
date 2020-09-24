@@ -4,18 +4,24 @@ import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
+import models.Otc_USA_Disclosure;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +104,7 @@ public class Otc_USA {
                             line = bufferedReader.readLine();
                             continue;
                         }
-                        processLine(line);
+                        processLine(line, link);
                         line = bufferedReader.readLine();
                     }
                 }
@@ -113,11 +119,46 @@ public class Otc_USA {
     }
 
 
-    private static void processLine(String line) {
-        System.out.println(line);
+    private static void processLine(String line, String link) {
+        String[] disclosure = line.split("\\|");
+        if (disclosure.length != 6) return;
+        Otc_USA_Disclosure otc_usa_disclosure=new Otc_USA_Disclosure();
+        try {
+            System.out.println("DATE : " + parseDate(disclosure[0]));
+            System.out.println("Symbol = Ticker :  " + disclosure[1]);
+            System.out.println("Short Volume =  Shares Shorted Volume : " + new BigInteger(disclosure[2]));
+            System.out.println("Short Exempt Volume = Short Exempt Volume : " + new BigInteger(disclosure[3]));
+            System.out.println("Total Volume = Total Volume : " + new BigInteger(disclosure[4]));
+            System.out.println("Market : " + disclosure[5]);
+            System.out.println("URL :" + link);
+        } catch (NumberFormatException ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+        if (link.contains("CNMS")) {
+            saveToConsolidateTable();
+        } else saveToOtherMarketTable();
+        System.out.println("************************");
     }
 
 
-    private static void saveToDB(){}
+    private static void saveToConsolidateTable() {
+        System.out.println("consolidated market");
+    }
 
+    private static void saveToOtherMarketTable() {
+        System.out.println("other market");
+    }
+
+    private static String parseDate(String date) {
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String output = null;
+        try {
+            output = outputFormat.format(df.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
 }
