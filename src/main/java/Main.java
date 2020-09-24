@@ -29,5 +29,6 @@ public class Main {
 //        Korea.scrapeData();
 //        Singapur.scrape();
         Otc_USA.scrapeData();
+//        Testing.scrapeData();
     }
 }
