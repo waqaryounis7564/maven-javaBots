@@ -12,14 +12,17 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 
 public class NZ {
-    private static String[] keyWords;
+    private static ArrayList<String> keyWords;
 
     public static void scrapeData() throws IOException {
+        keyWords = new ArrayList<String>(
+                Arrays.asList("own securities", "buyback",
+                        "buy-back", "buying back", "re-buying",
+                        "appendix 3e", "temit", "treasury", "acquisition", "own share", "repurchase")
+        );
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpGet request = new HttpGet("https://announcements.nzx.com/announcements/index.json");
             HttpResponse response = client.execute(request);
@@ -46,6 +49,7 @@ public class NZ {
         String ticker = object.getString("companyCode");
         BigInteger annsId = object.getBigInteger("announcementId");
         String annsUrl = "https://announcements.nzx.com/detail/" + annsId;
+
         if (containWords(headline, keyWords)) {
             NZDisclosure disclosure = new NZDisclosure();
             String parsedDate = parseDate(releasedDate);
@@ -53,10 +57,9 @@ public class NZ {
             disclosure.setReleasedDate(parsedDate);
             disclosure.setTicker(ticker);
             disclosure.setAnnsUrl(annsUrl);
-            saveToDB(disclosure);
+            saveToDB();
         }
 
-        System.out.println("--------------------------------------------");
     }
 
 
@@ -67,11 +70,12 @@ public class NZ {
         return simpleDateFormat2.format(parsedDate);
     }
 
-    private static boolean containWords(String headline, String[] keyWords) {
-        return Arrays.stream(keyWords).anyMatch(keyWord -> headline.toLowerCase().contains(keyWord.toLowerCase()));
+    private static boolean containWords(String headline, List<String> keyWords) {
+        return keyWords.stream().anyMatch(keyWord -> headline.toLowerCase().contains(keyWord.toLowerCase()));
     }
 
-    private static void saveToDB(NZDisclosure disclosure) {
+    private static void saveToDB() {
 
+        System.out.println("save to DB");
     }
 }
