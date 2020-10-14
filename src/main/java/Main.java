@@ -1,21 +1,19 @@
-import net.sourceforge.tess4j.TesseractException;
-import services.Korea;
-import services.NZ;
-import services.Otc_USA;
-import services.Singapur;
+import services.BR;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
 
-        NZ.scrapeData();
-
+//        BR.scrapeDate();
+//        BR.scrape();
+//        BR.scrapeDate();
+        BR.scraping();
 
     }
 }

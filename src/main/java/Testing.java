@@ -15,6 +15,9 @@ import java.util.List;
 public class Testing {
 public static void scrapeData() throws IOException {
 
+    List<String> books=Arrays.asList("waqar","bilal");
+
+    System.out.println(books.get(1));
 }
 
 }
