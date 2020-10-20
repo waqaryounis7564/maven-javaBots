@@ -40,34 +40,34 @@ import static utils.ParameterUtils.getSocketFactory;
 public class BR {
 
     public static void scrapeDate() throws IOException {
-        Map<String, Object> params = new LinkedHashMap<>();
-        params.put("dataDe", "01/10/2020");
-        params.put("dataAte", "14/10/2020");
-        params.put("empresa", "");
-        params.put("setorAtividade", "-1");
-        params.put("categoriaEmissor", "-1");
-        params.put("situacaoEmissor", "-1");
-        params.put("tipoDocumento", "-1");
-        params.put("dataReferencia", "");
-        params.put("categoria", "8");
-        params.put("tipo", "99");
-        params.put("especie", "-1");
-        params.put("periodo", "2");
-        params.put("horaIni", "");
-        params.put("horaFim", "");
-        params.put("palavraChave", "");
-        params.put("ultimaDtRef", "false");
-        params.put("tipoEmpresa", "0");
+//        Map<String, Object> params = new LinkedHashMap<>();
+//        params.put("dataDe", "01/10/2020");
+//        params.put("dataAte", "14/10/2020");
+//        params.put("empresa", "");
+//        params.put("setorAtividade", "-1");
+//        params.put("categoriaEmissor", "-1");
+//        params.put("situacaoEmissor", "-1");
+//        params.put("tipoDocumento", "-1");
+//        params.put("dataReferencia", "");
+//        params.put("categoria", "8");
+//        params.put("tipo", "99");
+//        params.put("especie", "-1");
+//        params.put("periodo", "2");
+//        params.put("horaIni", "");
+//        params.put("horaFim", "");
+//        params.put("palavraChave", "");
+//        params.put("ultimaDtRef", "false");
+//        params.put("tipoEmpresa", "0");
         try (WebClient webClient = new WebClient()) {
             URL url = new URL("https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx/ListarDocumentos");
             WebRequest requestSettings = new WebRequest(url, HttpMethod.POST);
-            requestSettings.setRequestParameters((List<NameValuePair>) params);
+//            requestSettings.setRequestParameters((List<NameValuePair>) params);
             webClient.getOptions().setCssEnabled(false);
             webClient.getOptions().setJavaScriptEnabled(false);
             webClient.getOptions(). setUseInsecureSSL(true);
 
+            webClient.waitForBackgroundJavaScript(10000*1000);
             final HtmlPage page = webClient.getPage(requestSettings);
-//            webClient.waitForBackgroundJavaScript(10000);
             System.out.println(page.getWebResponse().getContentAsString());
         }
     }
