@@ -4,6 +4,7 @@ package services;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 import org.apache.http.HttpResponse;
@@ -38,37 +39,24 @@ import java.util.zip.GZIPInputStream;
 import static utils.ParameterUtils.getSocketFactory;
 
 public class BR {
+//    final WebClient webClient = getDomNodeOrDie().getPage().getEnclosingWindow().getWebClient();
+//  webClient.getPage(webClient.getOptions().getHomePage());
 
     public static void scrapeDate() throws IOException {
-//        Map<String, Object> params = new LinkedHashMap<>();
-//        params.put("dataDe", "01/10/2020");
-//        params.put("dataAte", "14/10/2020");
-//        params.put("empresa", "");
-//        params.put("setorAtividade", "-1");
-//        params.put("categoriaEmissor", "-1");
-//        params.put("situacaoEmissor", "-1");
-//        params.put("tipoDocumento", "-1");
-//        params.put("dataReferencia", "");
-//        params.put("categoria", "8");
-//        params.put("tipo", "99");
-//        params.put("especie", "-1");
-//        params.put("periodo", "2");
-//        params.put("horaIni", "");
-//        params.put("horaFim", "");
-//        params.put("palavraChave", "");
-//        params.put("ultimaDtRef", "false");
-//        params.put("tipoEmpresa", "0");
         try (WebClient webClient = new WebClient()) {
-            URL url = new URL("https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx/ListarDocumentos");
-            WebRequest requestSettings = new WebRequest(url, HttpMethod.POST);
-//            requestSettings.setRequestParameters((List<NameValuePair>) params);
+            String url="https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx";
             webClient.getOptions().setCssEnabled(false);
-            webClient.getOptions().setJavaScriptEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions(). setUseInsecureSSL(true);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
 
-            webClient.waitForBackgroundJavaScript(10000*1000);
-            final HtmlPage page = webClient.getPage(requestSettings);
-            System.out.println(page.getWebResponse().getContentAsString());
+            final HtmlPage page = webClient.getPage(url);
+            DomElement submitBtn=page.querySelector("#btnConsulta");
+            HtmlPage pg2=submitBtn.click();
+            webClient.waitForBackgroundJavaScript(10000);
+            String res=pg2.asXml();
+            System.out.println(res);
+
         }
     }
 

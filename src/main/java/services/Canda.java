@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 public class Canda {
 
     public static void scrap() throws IOException {
+        //"4/16/2020","/Documents/2020/eabc951d-d11e-445c-bf04-70e18d9e0b86_en.csv"
 //        List<CanadaData> historicalData = new ArrayList<>();
         String url = "https://www.iiroc.ca/news/Pages/Short-Sale.aspx";
         Map<String, String> urls = new HashMap<String, String>() {{

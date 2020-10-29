@@ -1,5 +1,8 @@
 package services;
 
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -7,9 +10,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class SG {
+    public static void scrapeData(){
+        String url="https://www.sgx.com";
+        try(WebClient webClient=new WebClient()){
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
+            webClient.getOptions().setCssEnabled(false);
+            webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            webClient.waitForBackgroundJavaScriptStartingBefore(10000);
+
+            HtmlPage htmlPage =webClient.getPage(url);
+            System.out.println(htmlPage.getWebResponse().getContentAsString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public static void scrape() throws IOException {
         String res = download();
         JSONObject obj = new JSONObject(res);

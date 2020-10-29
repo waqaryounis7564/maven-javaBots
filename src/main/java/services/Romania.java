@@ -19,27 +19,39 @@ public class Romania {
             webClient.getOptions().setJavaScriptEnabled(true);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
             final HtmlPage homePage = webClient.getPage("https://www.bvb.ro/FinancialInstruments/SelectedData/CurrentReports");
-            for (previousRecords = 1; previousRecords <= jumpOfTen; previousRecords++) {
-                getRecords(homePage);
-                DomElement prevBtn = homePage.querySelector("#lbleft");
-                HtmlPage prevRecords=prevBtn.click();
-                getRecords(prevRecords);
-
+//            for (previousRecords = 1; previousRecords <= jumpOfTen; previousRecords++) {
+//                processPage(homePage.asXml());
+            processPage(homePage.asXml());
+            int pg = 0;
+            while (true) {
+                DomElement nextBtn = homePage.querySelector("#gvv_next");
+                DomElement btn = homePage.querySelector("#lbleft");
+                HtmlPage prvPage = btn.click();
+                processPage(prvPage.asXml());
+                pg++;
+                if (pg == 30) break;
+//                    HtmlPage nxtPage = btn.click();
+//                processPage(nxtPage.asXml());
+//                    String btnClass = nextBtn.getAttribute("class");
+//                    if (btnClass.contains("disabled")) break;
             }
 
         }
 
     }
-    private static void getRecords(HtmlPage page) throws IOException {
-        processPage(page.asXml());
-        while (true) {
-            DomElement nextBtn = page.querySelector("#gvv_next");
-            HtmlPage nxtPage = nextBtn.click();
-            processPage(nxtPage.asXml());
-            String btnClass = nextBtn.getAttribute("class");
-            if (btnClass.contains("disabled")) break;
-        }
-    }
+
+//    }
+//    private static DomElement getRecords(HtmlPage page) throws IOException {
+//        processPage(page.asXml());
+//        while (true) {
+//            DomElement nextBtn = page.querySelector("#gvv_next");
+//            HtmlPage nxtPage = nextBtn.click();
+//            processPage(nxtPage.asXml());
+//            String btnClass = nextBtn.getAttribute("class");
+//            if (btnClass.contains("disabled")) break;
+//        }
+//        return  page.querySelector("#lbleft");
+//    }
 
     private static void processPage(String response) {
         Document document = Jsoup.parse(response);
@@ -47,8 +59,7 @@ public class Romania {
             return;
 //   Document document = Jsoup.parse(String.valueOf(response));
         Elements tables = document.getElementsByTag("table");
-        if (tables == null || tables.size() < 2)
-            return;
+        if (tables == null || tables.size() < 2) return;
         Element table = tables.get(2);
         Elements announcements = table.getElementsByTag("tr");
         for (Element announcement : announcements) {
