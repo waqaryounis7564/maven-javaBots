@@ -1,6 +1,4 @@
-import services.America;
-import services.Romania;
-import services.Sweden;
+
 import services.Testable;
 
 import java.io.IOException;
@@ -12,8 +10,8 @@ public class Main {
 //        BR.scrapeDate();
 //        Romania.scrapeData();
 
-        America.scrapeData();
-//        Testable.scrape();
+//        America.scrapeData();
+        Testable.scrape();
 //        Sweden.scrapeData();
     }
 

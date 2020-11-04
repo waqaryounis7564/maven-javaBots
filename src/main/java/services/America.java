@@ -13,16 +13,19 @@ public class America {
         getHistory("20-f", 2020, 2020);
 
     }
+    private static void getDailyData(){
+
+    }
 
     private static void getHistory(String keyWord, int yearStart, int yearEnd) throws IOException {
         int start = 1;
         while (true) {
             String url = "https://www.sec.gov/cgi-bin/srch-edgar?text=" + keyWord + "&start=" + start + "&count=100&first=" + yearStart + "&last=" + yearEnd;
-            System.out.println("sout");
-            Document document = Jsoup.connect(url).get();
-            int pageCompleted = document.select("body>div>table>tbody>tr").size();
+            System.out.println("start");
+            Document document1 = Jsoup.connect(url).get();
+            int pageCompleted = document1.select("body>div>table>tbody>tr").size();
             System.out.println("no of rows : " + pageCompleted);
-            Elements rows = document.getElementsByTag("div").first().getElementsByTag("table").get(1).getElementsByTag("tr");
+            Elements rows = document1.getElementsByTag("div").first().getElementsByTag("table").get(1).getElementsByTag("tr");
             for(Element row :rows){
                 String companyName=row.select("td:nth-child(2)").text();
                 if(companyName.contains("Company")) continue;
@@ -37,6 +40,9 @@ public class America {
                 String savingUrl="https://www.sec.gov"+postUrl;
                 System.out.println(fillingDate);
                 System.out.println(savingUrl);
+                Document document2=Jsoup.connect(savingUrl).get();
+                String companyCode=document2.getElementsByClass("companyName").first().getElementsByTag("a").first().ownText().split("\\s+")[0];
+                System.out.println(companyCode);
                 System.out.println("--------------------------------------");
 
 
