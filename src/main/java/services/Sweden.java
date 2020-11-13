@@ -5,10 +5,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class Sweden {
@@ -17,17 +23,53 @@ public class Sweden {
         try {
             Document homePage = getPageContent("https://www.fi.se/sv/vara-register/blankningsregistret/");
             Elements tableRows = homePage.select("#aktuella > tbody>tr");
+            String publishedDate = homePage.select("body > div.container > div:nth-child(2) > div > div > div.results > h2").text().replace("Aktuella positioner", "").trim();
             issuers = tableRows.stream().
                     map(Sweden::consumeRow)
                     .collect(Collectors.toMap(entry -> entry.get("issuerName"), entry -> entry.get("issuerUrl")));
-            issuers.forEach(Sweden::getCurrentPositions);
-            issuers.forEach(Sweden::getHistoricalPositions);
+//            issuers.forEach((name,url)->getCurrentPositions(name,url,publishedDate));
+//            issuers.forEach((name,url)->getHistoricalPositions(name,url,publishedDate));
+            getCurrentPositions("SSAB AB", "https://www.fi.se/sv/vara-register/blankningsregistret/emittent/?id=529900329VS14ZIML164", "2020-11-11");
+            getHistoricalPositions("SSAB AB", "https://www.fi.se/sv/vara-register/blankningsregistret/emittent/?id=529900329VS14ZIML164", "2020-11-11");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
+    }
+
+    public static void readCsvFile() throws IOException {
+        String path = "src/main/static/history.csv";
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(path), StandardCharsets.ISO_8859_1))) {
+            String line = "";
+            while (!(line = br.readLine()).equals(",,,,,")) {
+                consumeLine(line);
+            }
+        }
+
+    }
+
+    private static void consumeLine(String line) {
+
+        if (line.contains("\"")) {
+            String[] split = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            if (split.length < 4) return;
+            System.out.println("position holder" + split[0].replace("\"", "").toUpperCase());
+            System.out.println("issuer" + split[1].toUpperCase());
+            System.out.println("isin" + split[2]);
+            System.out.println("positionInPercent" + split[3].replace("\"", ""));
+            System.out.println("positionDate" + split[4]);
+
+        } else {
+            String[] split2 = line.split(",");
+            System.out.println(split2[0].toUpperCase());
+            System.out.println(split2[1].toUpperCase());
+            System.out.println(split2[2]);
+            System.out.println(split2[3]);
+            System.out.println(split2[4]);
+        }
     }
 
     private static Map<String, String> consumeRow(Element row) {
@@ -39,13 +81,13 @@ public class Sweden {
         return issuerDetail;
     }
 
-    private static void getCurrentPositions(String issuerName,String url) {
+    private static void getCurrentPositions(String issuerName, String url, String publishedDate) {
         try {
-            Document document=getPageContent(url);
+            Document document = getPageContent(url);
             Elements elements = document.select("#aktuella > tbody>tr");
-            System.out.println(url);
-            System.out.println(issuerName);
-            elements.forEach(Sweden::getDisclosure);
+//            System.out.println(url);
+//            System.out.println(issuerName);
+            elements.forEach(row -> getDisclosure(row, issuerName, publishedDate, url));
             System.out.println("-------------------------------------------------");
 
         } catch (IOException e) {
@@ -53,13 +95,13 @@ public class Sweden {
         }
     }
 
-    private static void getHistoricalPositions(String issuerName,String url) {
+    private static void getHistoricalPositions(String issuerName, String url, String publishedDate) {
         try {
-            Document document=getPageContent(url);
+            Document document = getPageContent(url);
             Elements elements = document.select("#historiska > tbody>tr");
-            System.out.println(url);
-            System.out.println(issuerName);
-            elements.forEach(Sweden::getDisclosure);
+//            System.out.println(url);
+//            System.out.println(issuerName);
+            elements.forEach(row -> getDisclosure(row, issuerName, publishedDate, url));
             System.out.println("-------------------------------------------------");
 
         } catch (IOException e) {
@@ -71,12 +113,20 @@ public class Sweden {
         return Jsoup.connect(url).get();
     }
 
-    private static void getDisclosure(Element row){
-        System.out.println(row.select("td:nth-child(1)").text());
-        System.out.println(row.select("td:nth-child(2)").text());
-        System.out.println(row.select("td:nth-child(3)").text().replace(",", "."));
-        System.out.println(row.select("td:nth-child(4)").text());
+    private static void getDisclosure(Element row, String issuerName, String published, String url) {
+        System.out.println("issuerName: " + issuerName);
+        System.out.println("published date: " + published);
+        System.out.println("url :" + url);
+        System.out.println("position holder  :" + row.select("td:nth-child(1)").text());
+        System.out.println("Isin :" + row.select("td:nth-child(2)").text());
+        System.out.println("position as a percent :" + row.select("td:nth-child(3)").text().replace(",", "."));
+
+        System.out.println("position date :" + row.select("td:nth-child(4)").text());
         System.out.println("***************");
+
+    }
+
+    private static void saveToDB() {
 
     }
 }

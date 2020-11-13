@@ -7,14 +7,13 @@ import org.jsoup.select.Elements;
 import utils.ParameterUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class America {
     public static void scrapeData()  {
-        Stream.of("20-f","10-k","10-q").forEach(keyWord -> getHistory(keyWord,2020,2020));
-
-
+        Stream.of("20-f","10-q","10-k").forEach(keyWord -> getHistory(keyWord,2020,2020));
     }
 
     private static void getHistory(String keyWord, int yearStart, int yearEnd) {
@@ -34,27 +33,8 @@ public class America {
             System.out.println("no of rows : " + pageCompleted);
             Elements rows = document.getElementsByTag("div").first().getElementsByTag("table").get(1).getElementsByTag("tr");
             rows.forEach(America::extractData);
-//            for(Element row :rows){
-//                String companyName=row.select("td:nth-child(2)").text();
-//                if(companyName.contains("Company")) continue;
-//                System.out.println(companyName);
-//                String formType=row.select("td:nth-child(4)").text();
-//                String headline=formType+" - "+companyName;
-//                System.out.println(headline);
-//                String date=row.select("td:nth-child(5)").text();
-//                if(date.equals(""))continue;
-//                String  postUrl=row.select( "td:nth-child(3) > a:nth-child(2)").attr("href");
-//                String fillingDate=parsedDate(date);
-//                String savingUrl="http://www.sec.gov"+postUrl;
-//                System.out.println(fillingDate);
-//                System.out.println(savingUrl);
-//                System.out.println("--------------------------------------");
-//            }
-
             System.out.println(url);
             start += 100;
-
-
             System.out.println("end");
         }
 
@@ -70,12 +50,14 @@ public class America {
         System.out.println(companyName);
         String formType=row.select("td:nth-child(4)").text();
         String headline=formType+" - "+companyName;
-        System.out.println(headline);
+//        if(Stream.of("nt 10-","nt 20").anyMatch(word->headline.toLowerCase().contains(word))) return;
+        if(headline.toLowerCase().startsWith("nt")) return;
         String date=row.select("td:nth-child(5)").text();
         if(date.equals(""))return;
         String  postUrl=row.select( "td:nth-child(3) > a:nth-child(2)").attr("href");
         String fillingDate=parsedDate(date);
         String savingUrl="http://www.sec.gov"+postUrl;
+        System.out.println(headline);
         System.out.println(fillingDate);
         System.out.println(savingUrl);
         System.out.println("--------------------------------------");
