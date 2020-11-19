@@ -1,91 +1,87 @@
 package services;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Romania {
-    public static void scrapeData() throws IOException {
-        int jumpOfTen = 30;
-        int previousRecords;
-        try (WebClient webClient = new WebClient()) {
-            webClient.getOptions().setCssEnabled(false);
-            webClient.getOptions().setJavaScriptEnabled(true);
-            webClient.getOptions().setThrowExceptionOnScriptError(false);
-            final HtmlPage homePage = webClient.getPage("https://www.bvb.ro/FinancialInstruments/SelectedData/CurrentReports");
-//            for (previousRecords = 1; previousRecords <= jumpOfTen; previousRecords++) {
-//                processPage(homePage.asXml());
-            processPage(homePage.asXml());
-            int pg = 0;
-            while (true) {
-                DomElement nextBtn = homePage.querySelector("#gvv_next");
-                DomElement btn = homePage.querySelector("#lbleft");
-                HtmlPage prvPage = btn.click();
-                processPage(prvPage.asXml());
-                pg++;
-                if (pg == 30) break;
-//                    HtmlPage nxtPage = btn.click();
-//                processPage(nxtPage.asXml());
-//                    String btnClass = nextBtn.getAttribute("class");
-//                    if (btnClass.contains("disabled")) break;
-            }
+    public static void scrapeData() {
+        Connection.Response response = null;
+        String path = "https://www.bvb.ro/FinancialInstruments/SelectedData/CurrentReports";
+        try {
+            response = Jsoup.connect(path)
+                    .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
+                    .timeout(10000)
+                    .execute();
+            processPage(response.parse());
+
+        } catch (RuntimeException | IOException ex) {
+            System.out.println(ex.getMessage());
 
         }
-
     }
 
-//    }
-//    private static DomElement getRecords(HtmlPage page) throws IOException {
-//        processPage(page.asXml());
-//        while (true) {
-//            DomElement nextBtn = page.querySelector("#gvv_next");
-//            HtmlPage nxtPage = nextBtn.click();
-//            processPage(nxtPage.asXml());
-//            String btnClass = nextBtn.getAttribute("class");
-//            if (btnClass.contains("disabled")) break;
-//        }
-//        return  page.querySelector("#lbleft");
-//    }
 
-    private static void processPage(String response) {
-        Document document = Jsoup.parse(response);
-        if (document == null)
-            return;
-//   Document document = Jsoup.parse(String.valueOf(response));
-        Elements tables = document.getElementsByTag("table");
-        if (tables == null || tables.size() < 2) return;
-        Element table = tables.get(2);
-        Elements announcements = table.getElementsByTag("tr");
+    private static void processPage(Document document) throws RuntimeException {
+        Elements announcements = document.select("#gvv > tbody>trT");
+        if (announcements.size()==0) throw new RuntimeException("NO ROWS AVAILABLE FOR ROMANIA");
         for (Element announcement : announcements) {
-            Elements columns = announcement.getElementsByTag("td");
-            if (columns.size() != 6)
-                continue;
-            String strTicker = columns.first().getElementsByTag("strong").first().text().trim();
-            System.out.println(strTicker);
-            //  String strISIN = announcement.getElementsByTag("p").text();
-            String strCompanyName = columns.get(1).text();
-            System.out.println(strCompanyName);
-            String strAnnsDesc = columns.get(2).text();
-            if (strAnnsDesc.isEmpty() && columns.get(2).getElementsByTag("input").size() > 0)
-                strAnnsDesc = columns.get(2).getElementsByTag("input").first().attr("value");
-            if (strAnnsDesc.isEmpty())
-                System.out.println(announcement.toString());
-            String strReleasedDate = columns.get(3).text();
-            System.out.println(strReleasedDate);
-            //  String strHeadline = announcement.getElementsByTag("td").get(4).text();
-            String href = "";
-            if (columns.get(5).getElementsByTag("a").size() > 0)
-                href = columns.get(5).getElementsByTag("a").first().attr("href");
-            if (!href.isEmpty() && href.length() > 1) {
-                String savingUrl = "http://www.bvb.ro" + href;
-                System.out.println(savingUrl);
+            if (announcement.select("td").size() != 6) continue;
+            String strTicker = announcement.select("td:nth-child(1)").text().trim();
+            String strCompanyName = announcement.select("td:nth-child(2)").text().trim();
+            String strAnnsDesc = "";
+            if (announcement.select("td:nth-child(3)>span").size() > 0) {
+                strAnnsDesc = announcement.select("td:nth-child(3)>span").text();
+            } else {
+                strAnnsDesc = announcement.select("td:nth-child(3)>input").attr("value").trim();
             }
+            String strReleasedDate = announcement.select("td:nth-child(4)").text().trim();
+            String href = "";
+            if (announcement.select("td:nth-child(6)>a").size() > 2) {
+                href = announcement.select("td:nth-child(6)>a").get(1).attr("href");
+            } else {
+                href = announcement.select("td:nth-child(6)>a").attr("href");
+            }
+            String savingUrl = "";
+            if (href.contains("http://www.bvb.ro")) {
+                savingUrl = href;
+            } else {
+                savingUrl = "http://www.bvb.ro" + href;
+            }
+            if (iskeyWordAvailable(strAnnsDesc)) {
+                System.out.println(savingUrl + "     " + strAnnsDesc + "   " + strTicker);
+
+            }
+            if (strTicker.isEmpty() && strCompanyName.isEmpty() && strAnnsDesc.isEmpty() && strReleasedDate.isEmpty())
+                throw new RuntimeException("no response get from all columns of Romania");
         }
+    }
+
+    private static boolean iskeyWordAvailable(String desc) {
+        String[] keys = {
+                "share dealing",
+                "own securities",
+                "repurchase of shares",
+                "buyback",
+                "own shares",
+                "treasury share",
+                "treasury stock",
+                "buy-back",
+                "buying back",
+                "re-buying",
+                "share repurchase",
+                "acquisition of own shares",
+                "acquisition of treasury shares",
+                "redemption",
+                "repurchase",
+                "treasury",
+//                "buy"
+        };
+        return Arrays.stream(keys).anyMatch(key -> desc.toLowerCase().contains(key.toLowerCase()));
     }
 }
