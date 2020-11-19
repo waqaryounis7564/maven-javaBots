@@ -28,7 +28,7 @@ public class Romania {
 
 
     private static void processPage(Document document) throws RuntimeException {
-        Elements announcements = document.select("#gvv > tbody>trT");
+        Elements announcements = document.select("#gvv > tbody>tr");
         if (announcements.size()==0) throw new RuntimeException("NO ROWS AVAILABLE FOR ROMANIA");
         for (Element announcement : announcements) {
             if (announcement.select("td").size() != 6) continue;
