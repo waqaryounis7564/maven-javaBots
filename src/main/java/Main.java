@@ -1,5 +1,6 @@
 import org.junit.rules.TestRule;
 import services.*;
+import services.sbb.Australia;
 
 
 import java.io.IOException;
@@ -11,7 +12,9 @@ public class Main {
 //        Testable.scrape();
 //        America.scrapeData();
 //        Sweden.readCsvFile();
-        Romania.scrapeData();
+//        Romania.scrapeData();
+        Australia.scrapeData();
+//        Testable.scrape();
     }
 
 }

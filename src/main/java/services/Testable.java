@@ -1,9 +1,9 @@
 package services;
 
 public class Testable {
-    public static void show(int num) {
-        num += 2;
-        System.out.println(num);
+    public static int show(int num) {
+      return  num += 2;
+//        System.out.println(num);
     }
 
     public static void scrape() {
@@ -12,8 +12,9 @@ public class Testable {
             for (int i = 0; i <= 15; i++) {
                 res = i;
                 show(res);
+                String s="sss";
             }
-            System.out.println(res);
+            System.out.println(show(res));
 
         } catch (IndexOutOfBoundsException | ArithmeticException ex) {
 
