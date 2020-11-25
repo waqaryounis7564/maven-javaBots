@@ -1,19 +1,21 @@
 package services.sbb;
 
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Australia {
     public static void scrapeData() throws IOException {
-        URL url = new URL("https://asx.api.markitdigital.com/asx-research/1.0/markets/announcements?page=0&itemsPerPage=25&summaryCountsDate=2020-11-23&includeFacets=true");
+        URL url = new URL("https://asx.api.markitdigital.com/asx-research/1.0/markets/announcements?itemsPerPage=1000&summaryCountsDate=2020-11-23&includeFacets=true");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestProperty("Authorization","Bearer 83ff96335c2d45a094df02a206a39ff4");
-        conn.setRequestProperty("Content-Type","application/json");
+        conn.setRequestProperty("Authorization", "Bearer 83ff96335c2d45a094df02a206a39ff4");
+        conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestMethod("GET");
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String output;
@@ -24,25 +26,21 @@ public class Australia {
         }
 
         in.close();
-        // printing result from response
-        System.out.println("Response:-" + response.toString());
+        JSONObject jsonObject = new JSONObject(response.toString());
+        JSONArray jsonArray = jsonObject.
+                getJSONObject("data").
+                getJSONArray("items");
+
+     for (int i=0;i<jsonArray.length();i++){
+         String string = jsonArray.getJSONObject(i).
+                 getJSONArray("companyInfo")
+                 .getJSONObject(0).
+                         getString("symbol");
+         System.out.println(string);
+     }
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //
