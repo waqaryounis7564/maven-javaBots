@@ -1,72 +1,107 @@
 package services;
 
-import utils.ParameterUtils;
+import org.json.JSONObject;
 
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import javax.net.ssl.*;
+import java.io.*;
+
+import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+import static java.lang.Integer.parseInt;
+
 
 public class BR {
-    public static void scrape() throws ParseException {
 
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(new Date());
-        String time = "2020-11-30T21:16:23.000Z";
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//        Date parsed = sdf.parse(time);
+    public static void scrape() throws Exception {
+        JSONObject jsonObject=new JSONObject(getContent());
+        String response = jsonObject.getString("dados");
 
-//        sdf.setTimeZone(TimeZone.getTimeZone("Etc/GMT-10"));
-
-//        String dt = ParameterUtils.getDateInYourFormat(sdf.format(parsed), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd hh:mm:ss a");
-//        System.out.println("Australia :" + dt);
-//        Arrays.stream(TimeZone.getAvailableIDs()).forEach(p-> System.out.println(p));
-//Here you set to your timezone
-//        sdf.setTimeZone(TimeZone.getDefault());
-//        String pt = ParameterUtils.getDateInYourFormat(sdf.format(parsed), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd hh:mm:ss a");
-//        System.out.println("Pakistan :" + pt);
-//        System.out.println("in db "+pt);
-
-String j=ni(time);
-        System.out.println(j);
-
-}
-private static String ni(String date){
-    Date parsed = null;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    try {
-        parsed = sdf.parse(date);
-    } catch (ParseException e) {
-//        logger.error(e.getMessage());
     }
-    sdf.setTimeZone(TimeZone.getTimeZone("Etc/GMT-10"));
-    return ParameterUtils.getDateInYourFormat(sdf.format(parsed), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd HH:mm:ss");
-}
+    private static void processReponse(String response){
+
+
+
+
+    }
+    private static void processObject(String [] arr){
+        if (arr.length < 10) return;
+        if (Integer.class.isInstance(parseInt(arr[0].substring(0, 5)))) {
+            System.out.println("company name : "+arr[1]);
+            System.out.println("delivery Date : "+ arr[6]);
+            System.out.println("url :  https://www.rad.cvm.gov.br/ENET/frmExibirArquivoIPEExterno.aspx?NumeroProtocoloEntrega=" + arr[10]);
+        } else if (arr[0].startsWith("&*")) {
+            System.out.println("company name : "+ arr[1]);
+            System.out.println("delivery Date : "+ arr[6]);
+            System.out.println("url :  https://www.rad.cvm.gov.br/ENET/frmExibirArquivoIPEExterno.aspx?NumeroProtocoloEntrega=" + arr[10]);
+        } else {
+            System.out.println("company name : "+ arr[0]);
+            System.out.println("delivery Date : "+ arr[5]);
+            System.out.println("url :  https://www.rad.cvm.gov.br/ENET/frmExibirArquivoIPEExterno.aspx?NumeroProtocoloEntrega=" + arr[9]);
+
+        }
+
+
 }
 
-//Australia/ACT
-//        Australia/Adelaide
-//        Australia/Brisbane
-//        Australia/Broken_Hill
-//        Australia/Canberra
-//        Australia/Currie
-//        Australia/Darwin
-//        Australia/Eucla
-//        Australia/Hobart
-//        Australia/LHI
-//        Australia/Lindeman
-//        Australia/Lord_Howe
-//        Australia/Melbourne
-//        Australia/NSW
-//        Australia/North
-//        Australia/Perth
-//        Australia/Queensland
-//        Australia/South
-//        Australia/Sydney
-//        Australia/Tasmania
-//        Australia/Victoria
-//        Australia/West
-//        Australia/Yancowinna
+
+
+    private static String  getContent() throws Exception {
+        String obj = "{ dataDe: '01/12/2020', dataAte: '08/12/2020' , empresa: '', setorAtividade: '-1', categoriaEmissor: '-1', situacaoEmissor: '-1', tipoDocumento: '-1', dataReferencia: '', categoria: '8', tipo: '99', especie: '-1', periodo: '2', horaIni: '', horaFim: '', palavraChave:'',ultimaDtRef:'false', tipoEmpresa:'0'}";
+        URL url = new URL("https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx/ListarDocumentos");
+        HttpsURLConnection postConnection = (HttpsURLConnection) url.openConnection();
+        SSLSocketFactory sslSocketFactory = createSslSocketFactory();
+        postConnection.setSSLSocketFactory(sslSocketFactory);
+        postConnection.setRequestMethod("POST");
+        postConnection.setRequestProperty("accept", "application/json, text/javascript, */*; q=0.01");
+        postConnection.setRequestProperty("accept-language", "en-US,en;q=0.9");
+        postConnection.setRequestProperty("content-type", "application/json; charset=UTF-8");
+        postConnection.setRequestProperty("sec-fetch-dest", "empty");
+        postConnection.setRequestProperty("sec-fetch-mode", "cors");
+        postConnection.setRequestProperty("sec-fetch-site", "same-origin");
+        postConnection.setRequestProperty("x-dtpc", "28$18501402_282h15vAPCOUANCAARHEKQMOMMVJPAKBRQOUKCR-0e23");
+        postConnection.setRequestProperty("x-requested-with", "XMLHttpRequest");
+        postConnection.setRequestProperty("referrer", "https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx");
+        postConnection.setRequestProperty("referrerPolicy", "strict-origin-when-cross-origin");
+        postConnection.setRequestProperty("mode", "cors");
+        postConnection.setRequestProperty("credentials", "include");
+
+        postConnection.setDoOutput(true);
+        OutputStream os = postConnection.getOutputStream();
+        os.write(obj.getBytes());
+        os.flush();
+        os.close();
+
+
+        try (InputStream inputStream = postConnection.getInputStream()) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder line = new StringBuilder();
+            String line1;
+            while ((line1 = reader.readLine()) != null) {
+                line.append(line1);
+            }
+            return line.toString();
+        }
+
+    }
+
+    private static SSLSocketFactory createSslSocketFactory() throws Exception {
+        TrustManager[] byPassTrustManagers = new TrustManager[]{new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+
+            public void checkClientTrusted(X509Certificate[] chain, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
+            }
+        }};
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, byPassTrustManagers, new SecureRandom());
+        return sslContext.getSocketFactory();
+    }
+}
+
 

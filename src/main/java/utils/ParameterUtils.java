@@ -1,6 +1,8 @@
 package utils;
 
 
+
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -237,6 +239,7 @@ public class ParameterUtils {
             } catch (IOException ignore) {
 //                Logger logger = LoggerFactory.getLogger("Closing Stream Error");
 //                logger.info(ignore.getMessage());
+                System.out.println(ignore.getMessage());
             }
     }
 
@@ -279,5 +282,6 @@ public class ParameterUtils {
         }
         return null;
     }
+
 
 }
