@@ -1,9 +1,14 @@
 package services;
 
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utils.ParameterUtils;
+
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.URL;
@@ -16,15 +21,20 @@ import java.util.*;
 
 
 public class BR {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    public  void scrape() {
+        try {
+            String responseContent = getContent();
+            JSONObject obj = new JSONObject(responseContent);
+            String response = obj.getJSONObject("d").getString("dados");
+            processReponse(response);
+        } catch (JSONException ex) {
+            logger.error(ex.getMessage());
 
-    public static void scrape() throws Exception {
-        String responseContent = getContent();
-        JSONObject obj = new JSONObject(responseContent);
-        String response = obj.getJSONObject("d").getString("dados");
-        processReponse(response);
+        }
     }
 
-    private static void processReponse(String response) {
+    private  void processReponse(String response) {
         String[] arr = response.split("\\$&");
         String[] temporary = null;
         int chunk = 12;
@@ -32,14 +42,14 @@ public class BR {
             temporary = Arrays.copyOfRange(arr, i, i + chunk);
             if (Arrays.stream(temporary).allMatch(Objects::nonNull)) {
                 processObject(temporary);
-                System.out.println("**********************************************************************");
+
             }
         }
 
 
     }
 
-    private static void processObject(String[] arr) {
+    private void processObject(String[] arr) {
         if (arr.length < 10) return;
         if ((arr[0].substring(0, 5)).matches("^([\\s\\d]+)$")) {
             System.out.println("company name : " + arr[1]);
@@ -59,17 +69,21 @@ public class BR {
 
     }
 
-    private static String getDate(String line) {
+    private String getDate(String line) {
         String date = line.replaceAll(".*?\\<(.*)\\>.()", "").trim();
+        String thisFormat="dd/MM/yyyy HH:mm";
+        String requiredFormat="yyyy-MM-dd HH:mm";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
             Date parsed = simpleDateFormat.parse(date);
             date = simpleDateFormat.format(parsed);
 
         } catch (ParseException ex) {
-            ex.fillInStackTrace();
+            logger.error(ex.getMessage());
         }
-        return date;
+
+        return ParameterUtils.getDateInYourFormat(date, thisFormat, requiredFormat);
+
     }
 
     private static String getUrl(String line) {
@@ -79,19 +93,20 @@ public class BR {
                 .replace("OpenPopUpVer('frmExibirArquivoIPEExterno.aspx?NumeroProtocoloEntrega=", "")
                 .replace("')", "")
                 .trim();
+        if (key.isEmpty()) throw new RuntimeException("URL key not found for BRAZIL source");
         return MessageFormat.format("https://www.rad.cvm.gov.br/ENET/frmExibirArquivoIPEExterno.aspx?NumeroProtocoloEntrega={0}", key);
     }
 
-    private static String getContent() throws Exception {
+    private String getContent() {
         String response = "";
         String dateStart = getDate().get("monthAgo");
         String dateEnd = getDate().get("today");
         dateStart = MessageFormat.format("''{0}''", dateStart);
         dateEnd = MessageFormat.format("''{0}''", dateEnd);
         String obj = "{ dataDe: " + dateStart + ", dataAte: " + dateEnd + " , empresa: '', setorAtividade: '-1', categoriaEmissor: '-1', situacaoEmissor: '-1', tipoDocumento: '-1', dataReferencia: '', categoria: '8', tipo: '99', especie: '-1', periodo: '2', horaIni: '', horaFim: '', palavraChave:'',ultimaDtRef:'false', tipoEmpresa:'0'}";
-        URL url = new URL("https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx/ListarDocumentos");
 
         try {
+            URL url = new URL("https://www.rad.cvm.gov.br/ENET/frmConsultaExternaCVM.aspx/ListarDocumentos");
             HttpsURLConnection postConnection = (HttpsURLConnection) url.openConnection();
             SSLSocketFactory sslSocketFactory = createSslSocketFactory();
             postConnection.setConnectTimeout(5000);
@@ -128,8 +143,8 @@ public class BR {
                 }
                 response = line.toString();
             }
-        } catch (IOException ex) {
-            System.out.println(ex.fillInStackTrace());
+        } catch (Exception ex) {
+            logger.error(ex.fillInStackTrace().toString());
         }
         return response;
     }
@@ -145,7 +160,6 @@ public class BR {
         String today = simpleDateFormat.format(new Date());
         date.put("monthAgo", monthAgo);
         date.put("today", today);
-
         return date;
 
     }
@@ -166,6 +180,14 @@ public class BR {
         sslContext.init(null, byPassTrustManagers, new SecureRandom());
         return sslContext.getSocketFactory();
     }
+
+
+//    private void insertAnnouncement(String companyName, String url, String time) {
+//        if (!botsRepo.checkIsurlAlreadyExist(url, countryId)) {
+//
+//            botsRepo.insertAnnouncement(null, time, 14, 3, url, 76, companyName, null);
+//        }
+//    }
 }
 
 

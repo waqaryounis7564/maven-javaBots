@@ -11,7 +11,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
 
-    BR.scrape();
+    BR br=new BR();
+    br.scrape();
 //    Testable.scrape();
 
     }
