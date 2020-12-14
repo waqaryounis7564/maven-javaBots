@@ -11,9 +11,10 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
 
-    BR br=new BR();
-    br.scrape();
+//    BR br=new BR();
+//    br.scrape();
 //    Testable.scrape();
+        USA_form.scrape();
 
     }
 

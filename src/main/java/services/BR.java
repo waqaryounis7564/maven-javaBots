@@ -153,7 +153,7 @@ public class BR {
     private static Map<String, String> getDate() {
         HashMap<String, String> date = new HashMap<>();
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, -1);
+        cal.add(Calendar.MONTH, -6);
         Date result = cal.getTime();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         String monthAgo = simpleDateFormat.format(result);
