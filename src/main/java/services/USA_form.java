@@ -1,33 +1,66 @@
 package services;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.LoggerFactory;
 
 import org.slf4j.Logger;
+import org.jsoup.select.Elements;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.MessageFormat;
 
+
 public class USA_form {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static void scrape() {
-        for (int i=1;i<=241;i+=80){
-            String res=getContent(i);
+        int i = 1;
+        while (true) {
+            String res = getContent(i);
             Document parse = Jsoup.parse(res);
-            System.out.println(parse.body());
-            System.out.println("***********************************************************************");
+            Elements elements = parse.select("body > div > table>tbody>tr:not(:first-child)");
+            elements.forEach(USA_form::processRows);
+//            System.out.println(elements);
+            System.out.println("*********************************************************************** pagenumber" + Math.ceil(i / 80));
+            if (!res.contains("[NEXT]")) break;
+            i += 80;
+
+        }
+    }
+
+    private static void processRows(Element row)  {
+
+        String companyName = row.select("td:nth-child(2)").text();
+        String companyUrl = " https://www.sec.gov/" + row.select("td:nth-child(2)>a").attr("href");
+        String formType = row.select("td:nth-child(4)").text();
+        String fillingDate = row.select("td:nth-child(5)").text();
+//        System.out.println(MessageFormat.format("{0},{1},{2},{3}",companyName,formType,fillingDate,companyUrl));
+        System.out.println("------------------------------------");
+        processFillingDetail(companyUrl);
+    }
+
+    private static void processFillingDetail(String url) {
+        try{
+        Document document = Jsoup.connect(url).get();
+        String cikNumber = document.body().select("#filerDiv > div.companyInfo > span > a").text().replace("(see all company filings)", "").trim();
+        System.out.println(cikNumber);
+        }catch (IOException ex) {
+            System.out.println(ex.getCause());
         }
     }
 
     private static String getContent(int i) {
         String response = "";
+        String source = "https://www.sec.gov/cgi-bin/srch-edgar?text=13F-%2A&start=" + i + "&count=80&first=2020&last=2020";
         try {
-            URL url = new URL(MessageFormat.format("https://www.sec.gov/cgi-bin/srch-edgar?text=13F-%2A&start={0}&count=80&first=2020&last=2020",i));
+            URL url = new URL(source);
             HttpsURLConnection getConnection = (HttpsURLConnection) url.openConnection();
             getConnection.setConnectTimeout(5000);
             getConnection.setReadTimeout(10000);
