@@ -1,5 +1,7 @@
 
 import services.*;
+import services.representitives.comittes.Agriculture;
+import services.representitives.comittes.Appropriations;
 
 
 public class Main {
@@ -11,8 +13,11 @@ public class Main {
 //    br.scrape();
 //    Testable.scrape();
 //        USA_form.scrape();
-Testable.scrape();
+//Testable.scrape();
+//        Agriculture.scrape();
+        Appropriations.scrape();
     }
+
 
 
 }
