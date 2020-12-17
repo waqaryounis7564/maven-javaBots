@@ -7,7 +7,8 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        Education_and_Labor.scrape();
+        Energy_and_Commerce data=new Energy_and_Commerce();
+        data.scrape();
     }
 
 
