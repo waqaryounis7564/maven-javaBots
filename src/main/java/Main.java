@@ -9,7 +9,7 @@ public class Main {
 
 //        Ethics.scrape();
 //Judiciary.scrape();
-        NaturalResources.scrape();
+        OversightandReform.scrape();
     }
 
 
