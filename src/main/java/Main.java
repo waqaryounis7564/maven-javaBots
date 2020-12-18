@@ -8,7 +8,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
 //        Ethics.scrape();
-Judiciary.scrape();
+//Judiciary.scrape();
+        NaturalResources.scrape();
     }
 
 
