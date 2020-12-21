@@ -64,7 +64,13 @@ public class USA_form {
                     if (found) {
                         Element parent = t.parent();
                         if (parent.select(":nth-child(3)").text().contains("html")) {
-                            System.out.println("https://www.sec.gov/" + parent.select(":nth-child(3)>a").attr("href")); // link for form table
+                            String href="https://www.sec.gov/" + parent.select(":nth-child(3)>a").attr("href");// link for form table
+
+                            try {
+                                processFormTable(href);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
@@ -114,4 +120,30 @@ public class USA_form {
         }
         return response;
     }
-}
+
+    private static void processFormTable(String url) throws IOException{
+        Document document = Jsoup.connect(url).get();
+        Elements rows=document.select("body > table:nth-child(3) > tbody>tr:nth-child(n+4)");
+        rows.forEach(r->{
+            String nameOfIssuer=r.select("td:nth-child(1)").text();
+            String titleOfClass=r.select("td:nth-child(2)").text();
+            String cusip=r.select("td:nth-child(3)").text();
+            String value=r.select("td:nth-child(4)").text();
+            String sshPrnamt=r.select("td:nth-child(5)").text();
+            String sshPrnamtType=r.select("td:nth-child(6)").text();
+            String call=r.select("td:nth-child(7)").text();
+            String investmentDiscretion=r.select("td:nth-child(8)").text();
+            String otherManager=r.select("td:nth-child(9)").text();
+            String sole=r.select("td:nth-child(10)").text();
+            String shared=r.select("td:nth-child(11)").text();
+            String none=r.select("td:nth-child(12)").text();
+            System.out.println( MessageFormat.format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",nameOfIssuer,titleOfClass,cusip,value,sshPrnamt,sshPrnamtType,call,investmentDiscretion,otherManager,sole,shared,none)
+            );
+        });
+//        System.out.println(nameOfIssuer);
+
+//body > table:nth-child(3) > tbody > tr:nth-child(4) > td:nth-child(1)
+//        System.out.println(document.body().select("#filerDiv > div.companyInfo > span > a").text());
+    }
+    }
+
