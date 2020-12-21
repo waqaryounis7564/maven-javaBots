@@ -42,20 +42,41 @@ public class USA_form {
         String formType = row.select("td:nth-child(4)").text();
         String fillingDate = row.select("td:nth-child(5)").text();
 //        System.out.println(MessageFormat.format("{0},{1},{2},{3}",companyName,formType,fillingDate,companyUrl));
-        System.out.println("------------------------------------");
+        System.out.println("------------------------------------"+companyUrl);
         processFillingDetail(companyUrl);
     }
 
     private static void processFillingDetail(String url) {
-        try{
-        Document document = Jsoup.connect(url).get();
-        String cikNumber = document.body().select("#filerDiv > div.companyInfo > span > a").text().replace("(see all company filings)", "").trim();
-        System.out.println(cikNumber);
-        }catch (IOException ex) {
+        try {
+            Document document = Jsoup.connect(url).get();
+//        String cikNumber = document.body().select("#filerDiv > div.companyInfo > span > a").text().replace("(see all company filings)", "").trim();
+            String cikNumber = document.body().select("#filerDiv > div.companyInfo > span > a").text().replace("(see all company filings)", "").trim();
+//            System.out.println(cikNumber);
+            String reportDate = document.body().select("#formDiv > div.formContent > div:nth-child(2) > div:nth-child(2)").text().trim();
+            String acceptedDate = document.body().select("#formDiv > div.formContent > div:nth-child(1) > div:nth-child(4)").text().trim();
+            String effectivnessDate = document.body().select("#formDiv > div.formContent > div:nth-child(2) > div:nth-child(4)").text().trim();
+
+            if (document.select("#formDiv").size() == 2) {
+                Elements formLinks = document.select("#formDiv>div>table>tbody>tr>td:nth-child(4)");
+                //#formDiv > div > table
+                formLinks.forEach(t -> {
+                    boolean found = "information table".equals(t.text().toLowerCase());
+                    if (found) {
+                        Element parent = t.parent();
+                        if (parent.select(":nth-child(3)").text().contains("html")) {
+                            System.out.println("https://www.sec.gov/" + parent.select(":nth-child(3)>a").attr("href")); // link for form table
+                        }
+                    }
+
+
+                });
+
+
+            }
+        } catch (IOException ex) {
             System.out.println(ex.getCause());
         }
     }
-
     private static String getContent(int i) {
         String response = "";
         String source = "https://www.sec.gov/cgi-bin/srch-edgar?text=13F-%2A&start=" + i + "&count=80&first=2020&last=2020";

@@ -1,24 +1,19 @@
 
-import models.swedenModel;
+import thread.DownloadFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class Testing {
-public static void scrapeData() throws IOException {
+    public static void scrapeData() throws IOException {
+        System.out.println(Thread.currentThread().getName());
+        for (int i = 0; i < 5; i++) {
+        System.out.println(Thread.currentThread().getName());
+        Thread thread = new Thread(new DownloadFile());
+            thread.start();
+        }
 
-//    swedenModel a=Stream.of("a","b","c").map(Testing::getmodel).collect(Collectors.toMap());
-}
-public static swedenModel getmodel(String a){
-    swedenModel s=new swedenModel();
-    s.setIssuerName("waqar");
-    s.setSourceURL(a);
-    return s;
-}
+    }
 
 }
 

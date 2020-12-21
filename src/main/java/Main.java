@@ -1,17 +1,11 @@
-
-import services.*;
-import services.representitives.comittes.*;
-
+import services.Testable;
+import services.USA_form;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-
-//        Ethics.scrape();
-//Judiciary.scrape();
-        OversightandReform.scrape();
+        USA_form.scrape();
     }
-
 
 
 }
