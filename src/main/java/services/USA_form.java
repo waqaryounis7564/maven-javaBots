@@ -40,6 +40,7 @@ public class USA_form {
         String companyName = row.select("td:nth-child(2)").text();
         String companyUrl = " https://www.sec.gov/" + row.select("td:nth-child(2)>a").attr("href");
         String formType = row.select("td:nth-child(4)").text();
+        if(formType.contains("13F-NT")) return;
         String fillingDate = row.select("td:nth-child(5)").text();
 //        System.out.println(MessageFormat.format("{0},{1},{2},{3}",companyName,formType,fillingDate,companyUrl));
         System.out.println("------------------------------------"+companyUrl);
@@ -49,23 +50,20 @@ public class USA_form {
     private static void processFillingDetail(String url) {
         try {
             Document document = Jsoup.connect(url).get();
-//        String cikNumber = document.body().select("#filerDiv > div.companyInfo > span > a").text().replace("(see all company filings)", "").trim();
             String cikNumber = document.body().select("#filerDiv > div.companyInfo > span > a").text().replace("(see all company filings)", "").trim();
-//            System.out.println(cikNumber);
             String reportDate = document.body().select("#formDiv > div.formContent > div:nth-child(2) > div:nth-child(2)").text().trim();
             String acceptedDate = document.body().select("#formDiv > div.formContent > div:nth-child(1) > div:nth-child(4)").text().trim();
             String effectivnessDate = document.body().select("#formDiv > div.formContent > div:nth-child(2) > div:nth-child(4)").text().trim();
 
             if (document.select("#formDiv").size() == 2) {
                 Elements formLinks = document.select("#formDiv>div>table>tbody>tr>td:nth-child(4)");
-                //#formDiv > div > table
                 formLinks.forEach(t -> {
                     boolean found = "information table".equals(t.text().toLowerCase());
                     if (found) {
                         Element parent = t.parent();
                         if (parent.select(":nth-child(3)").text().contains("html")) {
-                            String href="https://www.sec.gov/" + parent.select(":nth-child(3)>a").attr("href");// link for form table
-
+                            String postUrl=parent.select(":nth-child(3)>a").attr("href");// link for form table
+                            String href="https://www.sec.gov/" + postUrl;
                             try {
                                 processFormTable(href);
                             } catch (IOException e) {
@@ -138,12 +136,9 @@ public class USA_form {
             String shared=r.select("td:nth-child(11)").text();
             String none=r.select("td:nth-child(12)").text();
             System.out.println( MessageFormat.format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",nameOfIssuer,titleOfClass,cusip,value,sshPrnamt,sshPrnamtType,call,investmentDiscretion,otherManager,sole,shared,none)
+
             );
         });
-//        System.out.println(nameOfIssuer);
-
-//body > table:nth-child(3) > tbody > tr:nth-child(4) > td:nth-child(1)
-//        System.out.println(document.body().select("#filerDiv > div.companyInfo > span > a").text());
     }
     }
 
