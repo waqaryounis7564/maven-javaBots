@@ -1,5 +1,8 @@
 package services;
 
+import models.USAForm13_model.CompanyDetail;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,10 +22,12 @@ import java.text.MessageFormat;
 
 public class USA_form {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static CompanyDetail companyDetail;
 
     public static void scrape() {
         int i = 1;
         while (true) {
+            companyDetail=new CompanyDetail();
             String res = getContent(i);
             Document parse = Jsoup.parse(res);
             Elements elements = parse.select("body > div > table>tbody>tr:not(:first-child)");
@@ -122,6 +127,7 @@ public class USA_form {
     private static void processFormTable(String url) throws IOException{
         Document document = Jsoup.connect(url).get();
         Elements rows=document.select("body > table:nth-child(3) > tbody>tr:nth-child(n+4)");
+        JSONArray jsonArray =new JSONArray();
         rows.forEach(r->{
             String nameOfIssuer=r.select("td:nth-child(1)").text();
             String titleOfClass=r.select("td:nth-child(2)").text();
@@ -135,10 +141,23 @@ public class USA_form {
             String sole=r.select("td:nth-child(10)").text();
             String shared=r.select("td:nth-child(11)").text();
             String none=r.select("td:nth-child(12)").text();
-            System.out.println( MessageFormat.format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",nameOfIssuer,titleOfClass,cusip,value,sshPrnamt,sshPrnamtType,call,investmentDiscretion,otherManager,sole,shared,none)
-
-            );
+//            System.out.println( MessageFormat.format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",nameOfIssuer,titleOfClass,cusip,value,sshPrnamt,sshPrnamtType,call,investmentDiscretion,otherManager,sole,shared,none));
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("nameOfIssuer",nameOfIssuer);
+            jsonObject.put("titleOfClass",titleOfClass);
+            jsonObject.put("cusip",cusip);
+            jsonObject.put("value",value);
+            jsonObject.put("sshPrnamt",sshPrnamt);
+            jsonObject.put("sshPrnamtType",sshPrnamtType);
+            jsonObject.put("call",call);
+            jsonObject.put("investmentDiscretion",investmentDiscretion);
+            jsonObject.put("otherManager",otherManager);
+            jsonObject.put("sole",sole);
+            jsonObject.put("shared",shared);
+            jsonObject.put("none",none);
+           jsonArray.put(jsonObject);
         });
+        jsonArray.forEach(t-> System.out.println(t));
     }
     }
 
