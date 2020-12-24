@@ -1,15 +1,6 @@
 package models.USAForm13_model;
 
 public class FilingDetail {
-  private int form_id;
-
-  public int getForm_id() {
-    return form_id;
-  }
-
-  public void setForm_id(int form_id) {
-    this.form_id = form_id;
-  }
 
   public String getCik_number() {
     return cik_number;

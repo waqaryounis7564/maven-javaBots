@@ -1,6 +1,7 @@
 package services;
 
 import models.USAForm13_model.CompanyDetail;
+import models.USAForm13_model.FilingDetail;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -27,12 +28,12 @@ public class USA_form {
     public static void scrape() {
         int i = 1;
         while (true) {
-            companyDetail=new CompanyDetail();
+            companyDetail = new CompanyDetail();
             String res = getContent(i);
             Document parse = Jsoup.parse(res);
             Elements elements = parse.select("body > div > table>tbody>tr:not(:first-child)");
             elements.forEach(USA_form::processRows);
-//            System.out.println(elements);
+
             System.out.println("*********************************************************************** pagenumber" + Math.ceil(i / 80));
             if (!res.contains("[NEXT]")) break;
             i += 80;
@@ -40,15 +41,19 @@ public class USA_form {
         }
     }
 
-    private static void processRows(Element row)  {
-
+    private static void processRows(Element row) {
+        companyDetail = new CompanyDetail();
         String companyName = row.select("td:nth-child(2)").text();
         String companyUrl = " https://www.sec.gov/" + row.select("td:nth-child(2)>a").attr("href");
         String formType = row.select("td:nth-child(4)").text();
-        if(formType.contains("13F-NT")) return;
+        if (formType.contains("13F-NT")) return;
         String fillingDate = row.select("td:nth-child(5)").text();
 //        System.out.println(MessageFormat.format("{0},{1},{2},{3}",companyName,formType,fillingDate,companyUrl));
-        System.out.println("------------------------------------"+companyUrl);
+        System.out.println("------------------------------------" + companyUrl);
+        companyDetail.setCompany_name(companyName);
+        companyDetail.setSource_url(companyUrl);
+        companyDetail.setForm_type(formType);
+        companyDetail.setFiling_date(fillingDate);
         processFillingDetail(companyUrl);
     }
 
@@ -60,6 +65,13 @@ public class USA_form {
             String acceptedDate = document.body().select("#formDiv > div.formContent > div:nth-child(1) > div:nth-child(4)").text().trim();
             String effectivnessDate = document.body().select("#formDiv > div.formContent > div:nth-child(2) > div:nth-child(4)").text().trim();
 
+            FilingDetail filingDetail=new FilingDetail();
+            filingDetail.setCik_number(cikNumber);
+            filingDetail.setReport_date(reportDate);
+            filingDetail.setAccepted_date(acceptedDate);
+            filingDetail.setEffectivness_date(effectivnessDate);
+            companyDetail.setFilingDetail(filingDetail);
+
             if (document.select("#formDiv").size() == 2) {
                 Elements formLinks = document.select("#formDiv>div>table>tbody>tr>td:nth-child(4)");
                 formLinks.forEach(t -> {
@@ -67,8 +79,8 @@ public class USA_form {
                     if (found) {
                         Element parent = t.parent();
                         if (parent.select(":nth-child(3)").text().contains("html")) {
-                            String postUrl=parent.select(":nth-child(3)>a").attr("href");// link for form table
-                            String href="https://www.sec.gov/" + postUrl;
+                            String postUrl = parent.select(":nth-child(3)>a").attr("href");// link for form table
+                            String href = "https://www.sec.gov/" + postUrl;
                             try {
                                 processFormTable(href);
                             } catch (IOException e) {
@@ -86,6 +98,7 @@ public class USA_form {
             System.out.println(ex.getCause());
         }
     }
+
     private static String getContent(int i) {
         String response = "";
         String source = "https://www.sec.gov/cgi-bin/srch-edgar?text=13F-%2A&start=" + i + "&count=80&first=2020&last=2020";
@@ -124,40 +137,45 @@ public class USA_form {
         return response;
     }
 
-    private static void processFormTable(String url) throws IOException{
+    private static void processFormTable(String url) throws IOException {
         Document document = Jsoup.connect(url).get();
-        Elements rows=document.select("body > table:nth-child(3) > tbody>tr:nth-child(n+4)");
-        JSONArray jsonArray =new JSONArray();
-        rows.forEach(r->{
-            String nameOfIssuer=r.select("td:nth-child(1)").text();
-            String titleOfClass=r.select("td:nth-child(2)").text();
-            String cusip=r.select("td:nth-child(3)").text();
-            String value=r.select("td:nth-child(4)").text();
-            String sshPrnamt=r.select("td:nth-child(5)").text();
-            String sshPrnamtType=r.select("td:nth-child(6)").text();
-            String call=r.select("td:nth-child(7)").text();
-            String investmentDiscretion=r.select("td:nth-child(8)").text();
-            String otherManager=r.select("td:nth-child(9)").text();
-            String sole=r.select("td:nth-child(10)").text();
-            String shared=r.select("td:nth-child(11)").text();
-            String none=r.select("td:nth-child(12)").text();
+        Elements rows = document.select("body > table:nth-child(3) > tbody>tr:nth-child(n+4)");
+        JSONArray jsonArray = new JSONArray();
+        rows.forEach(r -> {
+            String nameOfIssuer = r.select("td:nth-child(1)").text();
+            String titleOfClass = r.select("td:nth-child(2)").text();
+            String cusip = r.select("td:nth-child(3)").text();
+            String value = r.select("td:nth-child(4)").text();
+            String sshPrnamt = r.select("td:nth-child(5)").text();
+            String sshPrnamtType = r.select("td:nth-child(6)").text();
+            String call = r.select("td:nth-child(7)").text();
+            String investmentDiscretion = r.select("td:nth-child(8)").text();
+            String otherManager = r.select("td:nth-child(9)").text();
+            String sole = r.select("td:nth-child(10)").text();
+            String shared = r.select("td:nth-child(11)").text();
+            String none = r.select("td:nth-child(12)").text();
 //            System.out.println( MessageFormat.format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",nameOfIssuer,titleOfClass,cusip,value,sshPrnamt,sshPrnamtType,call,investmentDiscretion,otherManager,sole,shared,none));
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("nameOfIssuer",nameOfIssuer);
-            jsonObject.put("titleOfClass",titleOfClass);
-            jsonObject.put("cusip",cusip);
-            jsonObject.put("value",value);
-            jsonObject.put("sshPrnamt",sshPrnamt);
-            jsonObject.put("sshPrnamtType",sshPrnamtType);
-            jsonObject.put("call",call);
-            jsonObject.put("investmentDiscretion",investmentDiscretion);
-            jsonObject.put("otherManager",otherManager);
-            jsonObject.put("sole",sole);
-            jsonObject.put("shared",shared);
-            jsonObject.put("none",none);
-           jsonArray.put(jsonObject);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("nameOfIssuer", nameOfIssuer);
+            jsonObject.put("titleOfClass", titleOfClass);
+            jsonObject.put("cusip", cusip);
+            jsonObject.put("value", value);
+            jsonObject.put("sshPrnamt", sshPrnamt);
+            jsonObject.put("sshPrnamtType", sshPrnamtType);
+            jsonObject.put("call", call);
+            jsonObject.put("investmentDiscretion", investmentDiscretion);
+            jsonObject.put("otherManager", otherManager);
+            jsonObject.put("sole", sole);
+            jsonObject.put("shared", shared);
+            jsonObject.put("none", none);
+            jsonArray.put(jsonObject);
         });
-        jsonArray.forEach(t-> System.out.println(t));
+        companyDetail.setInformationTables(jsonArray);
+        System.out.println(companyDetail.getCompany_name());
+        System.out.println(companyDetail.getSource_url());
+        System.out.println(companyDetail.getForm_type());
+        companyDetail.getInformationTables().forEach(t-> System.out.println(t));
+        System.out.println(companyDetail.getFilingDetail().getCik_number());
     }
-    }
+}
 
