@@ -170,6 +170,7 @@ public class USA_form {
             jsonObject.put("none", none);
             jsonArray.put(jsonObject);
         });
+        companyDetail.setTableUrl(url);
         companyDetail.setInformationTables(jsonArray);
         System.out.println(companyDetail.getCompany_name());
         System.out.println(companyDetail.getSource_url());
@@ -177,5 +178,9 @@ public class USA_form {
         companyDetail.getInformationTables().forEach(t-> System.out.println(t));
         System.out.println(companyDetail.getFilingDetail().getCik_number());
     }
+    private static void crawlByDate(){
+
+    }
+
 }
 

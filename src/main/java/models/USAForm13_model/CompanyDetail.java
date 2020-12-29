@@ -9,6 +9,16 @@ public class CompanyDetail {
     private String form_type;
     private String source_url;
     private String filing_date;
+
+    public String getTableUrl() {
+        return tableUrl;
+    }
+
+    public void setTableUrl(String tableUrl) {
+        this.tableUrl = tableUrl;
+    }
+
+    private String tableUrl;
     private FilingDetail filingDetail;
     private JSONArray informationTables;
 
