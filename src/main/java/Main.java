@@ -12,30 +12,31 @@ import java.util.Locale;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        String res=getDayStringOld("2020/12/24");
+        String res = getDayStringOld("2020/12/28");
         System.out.println(res);
     }
-    public static String getDayStringOld(String  date) throws ParseException {
-        SimpleDateFormat format1=new SimpleDateFormat("yyyy/MM/dd");
-        Date dt1= null;
+
+    public static String getDayStringOld(String date) throws ParseException {
+        String outputDate=null;
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy/MM/dd");
+        Date dt1 = null;
         try {
             dt1 = format1.parse(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        DateFormat format2=new SimpleDateFormat("EEEE");
-        String finalDay=format2.format(dt1);
-
+        SimpleDateFormat format2 = new SimpleDateFormat("EEEE");
+        String finalDay = format2.format(dt1);
         Calendar c = Calendar.getInstance();
-        c.setTime(dt1); // Now use today date.
-        c.add(Calendar.DATE, 2); // Adding 5 days
-        String output = format1.format(c.getTime());
-        System.out.println(format2.format(format1.parse(output)));
-
-if(finalDay.equals("Thursday")){
-    c.add(Calendar.DATE, 2);
-}
-        return finalDay;
+        c.setTime(dt1);
+        if (finalDay.equals("Thursday") || finalDay.equals("Friday")) {
+            c.add(Calendar.DATE, 4);
+            outputDate = format1.format(c.getTime());
+        } else {
+            c.add(Calendar.DATE, 2);
+            outputDate = format1.format(c.getTime());
+        }
+        return outputDate;
     }
 
 
