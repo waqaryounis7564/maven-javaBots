@@ -1,6 +1,9 @@
 package services.SDS;
 
 import models.sds.KoreaDisclosure;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.net.ssl.*;
 import java.io.*;
@@ -8,6 +11,9 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +33,47 @@ public class Korea {
 
     private void crawlWeb() {
         String content = getContent();
-        System.out.println(content);
+        int totalPages = 0;
+        try {
+            JSONObject jsonObject = new JSONObject(content);
+            JSONArray data = jsonObject.getJSONArray("block1");
+            int totCnt = Integer.parseInt(data.getJSONObject(0).getString("totCnt"));
+            totalPages = (int) Math.ceil(totCnt / 500.0);
+            for (int i = 0; i < data.length(); i++) {
+                KoreaDisclosure korea = new KoreaDisclosure();
+                JSONObject obj = (JSONObject) data.get(i);
+                String positionDate = obj.getString("trd_dd");
+                String isin = obj.getString("isu_cd");
+                String issuerName = obj.getString("isu_abbrv");
+                String shareShortedVolume = obj.getString("bal_qty");
+                String shareOutstanding = obj.getString("list_shrs");
+                String shareShortedValue = obj.getString("bal_amt");
+                String marketCap = obj.getString("mktcap");
+                String shortPositionPercentage = obj.getString("bal_rto");
+//                System.out.println(positionDate + isin + issuerName + shareShortedVolume + shareOutstanding + shareShortedValue + marketCap + shortPositionPercentage);
 
+                korea.setIsin(isin);
+                korea.setIssuerName(issuerName);
+                korea.setPositionDate(positionDate);
+                korea.setShareShortedVolume(shareShortedVolume);
+                korea.setShareOutstanding(shareOutstanding);
+                korea.setShareShortedValue(shareShortedValue);
+                korea.setMarketCap(marketCap);
+                korea.setShortPositionPercentage(shortPositionPercentage);
+                korea.setReportingDate(getReportingDate());
+                disclosures.put(positionDate + issuerName, korea);
+                count++;
+            }
+
+        } catch (JSONException ex) {
+            System.out.println(ex.fillInStackTrace());
+            getContent();
+        }
+//        if (totalPages > 1) {
+//            for (int i = 0; i <= totalPages; i++) {
+//
+//            }
+//        }
     }
 
     private String getContent() {
@@ -39,9 +84,9 @@ public class Korea {
 //        dateEnd = MessageFormat.format("''{0}''", dateEnd);
         String obj = "mkt_tp_cd=1&isu_cdnm=All&isu_cd=&isu_nm=&isu_srt_cd=&strt_dd=20201220&end_dd=20201230&pagePath=%2Fcontents%2FGLB%2F05%2F0501%2F0501120600%2FGLB0501120600.jsp&code=gRv3qxTLY3PfBaFw%2FxSa%2Bk5pUz3yb5NE11wDz1HH3inyEaI8W00Azc4YA2O%2Fbf8h5qKm4V1erZgsOW3mGUBoSjJK5HeSRdABCUvGD9egjtLbBenRvOdipYFFGtSyDN3GLsJIO3Uz0uzVjcCMAdiez0HxaJGdXuklBLh9ntHVM2XyFlg0YnTxIdUWX3%2BZbA7Y";
         try {
-            URL url = new URL(null,"http://global.krx.co.kr/contents/GLB/99/GLB99000001.jspx", new sun.net.www.protocol.https.Handler());
+            URL url = new URL(null, "http://global.krx.co.kr/contents/GLB/99/GLB99000001.jspx", new sun.net.www.protocol.https.Handler());
             HttpsURLConnection postConnection = (HttpsURLConnection) url.openConnection();
-            postConnection.setConnectTimeout(5000);
+            postConnection.setConnectTimeout(10000);
             postConnection.setReadTimeout(10000);
             postConnection.setRequestMethod("POST");
             postConnection.setRequestProperty("accept", "application/json, text/javascript, */*; q=0.01");
@@ -105,6 +150,13 @@ public class Korea {
         korea.setShortPositionPercentage(split[7]);
         disclosures.put(split[0] + split[2], korea);
         count++;
+
+    }
+
+    private String getReportingDate() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Date date=new Date();
+        return simpleDateFormat.format(date);
 
     }
 }
