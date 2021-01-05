@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -102,33 +103,32 @@ public class OtcCanada {
         return response;
     }
 
-    private static void readExcel() throws IOException, InvalidFormatException {
-        try (InputStream inp = new FileInputStream(new File("src/main/static/canda.xls"))) {
-            Workbook wb = WorkbookFactory.create(inp);
-            Sheet sheet = wb.getSheetAt(0);
-            DataFormatter dataFormatter = new DataFormatter();
-            Iterator<Row> rowIterator = sheet.rowIterator();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
+    private static void readExcel(InputStream input) throws IOException, InvalidFormatException {
+        Workbook wb = WorkbookFactory.create(input);
+        Sheet sheet = wb.getSheetAt(0);
+        DataFormatter dataFormatter = new DataFormatter();
+        Iterator<Row> rowIterator = sheet.rowIterator();
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
 
-                // Now let's iterate over the columns of the current row
-                Iterator<Cell> cellIterator = row.cellIterator();
+            // Now let's iterate over the columns of the current row
+            Iterator<Cell> cellIterator = row.cellIterator();
 
-                while (cellIterator.hasNext()) {
-                    if (row.getRowNum() == 1) break;
-                    Cell cell = cellIterator.next();
-                    String cellValue = dataFormatter.formatCellValue(cell);
-                    System.out.print(cellValue + "\t");
+            while (cellIterator.hasNext()) {
+                if (row.getRowNum() == 1) break;
+                Cell cell = cellIterator.next();
+                String cellValue = dataFormatter.formatCellValue(cell);
+                System.out.print(cellValue + "\t");
 
-                }
-                System.out.println("****");
             }
-
-
+            System.out.println("****");
         }
+
+
     }
 
-    private String downloadExcel(String url) {
+    private void downloadExcel(String url) {
+        StringBuffer response=new StringBuffer();
         try {
             URL link = new URL(url);
             HttpsURLConnection getConnection = (HttpsURLConnection) link.openConnection();
@@ -136,18 +136,12 @@ public class OtcCanada {
             getConnection.setReadTimeout(10000);
             getConnection.setRequestMethod("GET");
             getConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                    getConnection.getInputStream()))) {
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
+            try (InputStream inputStream =  getConnection.getInputStream()) {
+                readExcel(inputStream);
             }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+        }catch (IOException | InvalidFormatException ex){
+            ex.getCause();
         }
-        return records.toString();
+
     }
 }
