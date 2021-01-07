@@ -14,9 +14,9 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class OtcCanada {
@@ -168,5 +168,27 @@ public class OtcCanada {
             ex.getCause();
         }
 
+    }
+    private static String getPositionDate(String date) {
+        String outputDate = null;
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy/MM/dd");
+        Date dt1 = null;
+        try {
+            dt1 = format1.parse(date);
+        } catch (ParseException e) {
+//            logger.error(e.getMessage());
+        }
+        SimpleDateFormat format2 = new SimpleDateFormat("EEEE");
+        String finalDay = format2.format(dt1);
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt1);
+        if (finalDay.equals("Monday")) {
+            c.add(Calendar.DATE, 4);
+            outputDate = format1.format(c.getTime());
+        } else {
+            c.add(Calendar.DATE, 6);
+            outputDate = format1.format(c.getTime());
+        }
+        return outputDate;
     }
 }
