@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,9 +21,11 @@ import java.util.Iterator;
 
 public class OtcCanada {
     private HashMap<String, String> records;
+    private HashMap<String, OtcCandaDisclosure> disclosures;
 
     public void scrape() {
         records = new HashMap<>();
+        disclosures = new HashMap<>();
         ArrayList<String> historyRecods = new ArrayList<String>() {
             {
                 add("_wpcmWpid=&wpcmVal=&MSOWebPartPage_PostbackSource=&MSOTlPn_SelectedWpId=&MSOTlPn_View=0&MSOTlPn_ShowSettings=False&MSOGallery_SelectedLibrary=&MSOGallery_FilterString=&MSOTlPn_Button=none&__EVENTTARGET=ctl00%24ctl39%24g_bd8fd9d9_59af_4a24_b5ca_be6d9ec191f7&__EVENTARGUMENT=dvt_firstrow%3D%7B11%7D%3Bdvt_startposition%3D%7BPaged%3DTRUE%26p_ReleaseDate%3D20200807+12%3A00%3A27%26p_ID%3D24415%7D&__REQUESTDIGEST=0xD8CC264E33CC26412EF394533AC1F32F4791196FA88FDCD729A5A83838E052EB2557EC63F81BF581EF1A711D33E9875DFCFE4C6FB287C4C9AA5612DCABFE4726%2C05+Jan+2021+07%3A15%3A22+-0000&MSOSPWebPartManager_DisplayModeName=Browse&MSOSPWebPartManager_ExitingDesignMode=false&MSOWebPartPage_Shared=&MSOLayout_LayoutChanges=&MSOLayout_InDesignMode=&_wpSelected=&_wzSelected=&MSOSPWebPartManager_OldDisplayModeName=Browse&MSOSPWebPartManager_StartWebPartEditingName=false&MSOSPWebPartManager_EndWebPartEditing=false&__VIEWSTATE=%2FwEPDwUBMA9kFgJmD2QWAgIBD2QWBAIBD2QWBgIXD2QWAgIDD2QWAmYPZBYCZg88KwAGAGQCGQ9kFgICAQ9kFgYFJmdfNDM4Y2QzN2FfNTU1Ml80YzZhX2JhN2ZfYmNkY2VhNGM4NDA2D2QWBGYPFgIeB1Zpc2libGVoZAIBDxYCHwBoZAUmZ19iZDhmZDlkOV81OWFmXzRhMjRfYjVjYV9iZTZkOWVjMTkxZjcPDxYSHgtEZXNjcmlwdGlvbmUeCURpcmVjdGlvbgsqKlN5c3RlbS5XZWIuVUkuV2ViQ29udHJvbHMuQ29udGVudERpcmVjdGlvbgAeBVRpdGxlBQpEYXRhVmlldyAxHgpDaHJvbWVUeXBlAgIeBF8hU0ICgIMIHgVXaWR0aBweEEZpbHRlck9wZXJhdGlvbnMyjQUAAQAAAP%2F%2F%2F%2F8BAAAAAAAAAAQBAAAAkwJTeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5EaWN0aW9uYXJ5YDJbW1N5c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV0sW01pY3Jvc29mdC5TaGFyZVBvaW50LldlYlBhcnRQYWdlcy5GaWx0ZXJPcGVyYXRpb24sIE1pY3Jvc29mdC5TaGFyZVBvaW50LCBWZXJzaW9uPTE1LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTcxZTliY2UxMTFlOTQyOWNdXQMAAAAHVmVyc2lvbghDb21wYXJlcghIYXNoU2l6ZQADAAiSAVN5c3RlbS5Db2xsZWN0aW9ucy5HZW5lcmljLkdlbmVyaWNFcXVhbGl0eUNvbXBhcmVyYDFbW1N5c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dCAAAAAAJAgAAAAAAAAAEAgAAAJIBU3lzdGVtLkNvbGxlY3Rpb25zLkdlbmVyaWMuR2VuZXJpY0VxdWFsaXR5Q29tcGFyZXJgMVtbU3lzdGVtLlN0cmluZywgbXNjb3JsaWIsIFZlcnNpb249NC4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5XV0AAAAACx4GSGVpZ2h0HB4LUGFyYW1WYWx1ZXMy8wYAAQAAAP%2F%2F%2F%2F8BAAAAAAAAAAwCAAAAWE1pY3Jvc29mdC5TaGFyZVBvaW50LCBWZXJzaW9uPTE1LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTcxZTliY2UxMTFlOTQyOWMFAQAAAD1NaWNyb3NvZnQuU2hhcmVQb2ludC5XZWJQYXJ0UGFnZXMuUGFyYW1ldGVyTmFtZVZhbHVlSGFzaHRhYmxlAQAAAAVfY29sbAMcU3lzdGVtLkNvbGxlY3Rpb25zLkhhc2h0YWJsZQIAAAAJAwAAAAQDAAAAHFN5c3RlbS5Db2xsZWN0aW9ucy5IYXNodGFibGUHAAAACkxvYWRGYWN0b3IHVmVyc2lvbghDb21wYXJlchBIYXNoQ29kZVByb3ZpZGVyCEhhc2hTaXplBEtleXMGVmFsdWVzAAADAwAFBQsIHFN5c3RlbS5Db2xsZWN0aW9ucy5JQ29tcGFyZXIkU3lzdGVtLkNvbGxlY3Rpb25zLklIYXNoQ29kZVByb3ZpZGVyCOxROD8gAAAACgolAAAACQQAAAAJBQAAABAEAAAADAAAAAYGAAAADGR2dF9maXJzdHJvdwYHAAAABkxpbmtJRAYIAAAAEWR2dF9zdGFydHBvc2l0aW9uBgkAAAANTWFudWFsUmVmcmVzaAYKAAAAC01heGltdW1Sb3dzBgsAAAAMbmV4dHBhZ2VkYXRhBgwAAAANU3RhcnRSb3dJbmRleAYNAAAAEGR2dF9uZXh0cGFnZWRhdGEGDgAAAAZMaXN0SUQGDwAAAAVUb2RheQYQAAAACkZpbHRlckxpbmsGEQAAAAZVc2VySUQQBQAAAAwAAAAGEgAAAAExBhMAAAADNzExBhQAAAAABhUAAAAFRmFsc2UGFgAAAAIxMAYXAAAAATAGGAAAAAEwBhkAAAA7UGFnZWQ9VFJVRSZwX1JlbGVhc2VEYXRlPTIwMjAwODA3JTIwMTIlM2EwMCUzYTI3JnBfSUQ9MjQ0MTUGGgAAACZ7QTM2QjYzN0UtODE1RC00RDJFLUE1NTUtQzkwQkIzOTMyMjkyfQYbAAAAFDIwMjEtMDEtMDVUMDI6MTU6MjJaBhwAAAARPyZQYWdlRmlyc3RSb3c9MSYGHQAAAA9DdXJyZW50VXNlck5hbWULZGQFJmdfNmM0YTMzMGVfYjIxNF80N2I3X2JhMjdfZjEyZDY1ZTQ5ZjE3D2QWBGYPFgIfAGhkAgEPFgIfAGhkAiMPZBYCZg9kFgJmDzwrAAYAZAIHD2QWAgIHD2QWAgICD2QWAgIFD2QWAgIDDxYCHwBoFgJmD2QWBAICD2QWBgIBDxYCHwBoZAIDDxYCHwBoZAIFDxYCHwBoZAIDDw8WAh4JQWNjZXNzS2V5BQEvZGQYAgUQY3RsMDAkQ3VycmVudE5hdg8PZAUcTWFya2V0IE1vbml0b3JpbmcgJiBBbmFseXNpc2QFGWN0bDAwJFRvcE5hdmlnYXRpb25NZW51VjQPD2QFCEluZHVzdHJ5ZEqMmLjCpVGeU6fyiCgxBuy%2FYo4uBO0qzJfOqe75LPD%2F&__VIEWSTATEGENERATOR=4E82104B&__EVENTVALIDATION=%2FwEdAAOaszfPCIDgL4tNCn%2FkkKVJI9WgT0tlKuBuDzz85Ii%2FZMojbFppxYH1m8FlZhwcrxN0BUDXJDCp9C%2BJ45sv2dSIWMMy4NiPUlSCPCX%2B%2Flk%2BTQ%3D%3D&ctl00%24g_70e4ef30_5add_4475_8351_8c8418406327%24ctl00%24txbKeyWord=");
@@ -39,6 +42,7 @@ public class OtcCanada {
         });
 
         records.values().forEach(link -> downloadExcel(link));
+        disclosures.values().forEach(obj -> System.out.println(MessageFormat.format("{0}|{1}|{2}|{3}|{4}", obj.getIssuer_name(), obj.getTicker(), obj.getMarket(), obj.getNo_of_shorted_shares_position(), obj.getNet_change())));
     }
 
     private void extractData(Document document) {
@@ -103,32 +107,52 @@ public class OtcCanada {
         return response;
     }
 
-    private static void readExcel(InputStream input) throws IOException, InvalidFormatException {
+    private void readExcel(InputStream input) throws IOException, InvalidFormatException {
         Workbook wb = WorkbookFactory.create(input);
         Sheet sheet = wb.getSheetAt(0);
+        String sheetName = sheet.getSheetName();
         DataFormatter dataFormatter = new DataFormatter();
         Iterator<Row> rowIterator = sheet.rowIterator();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
-
-            // Now let's iterate over the columns of the current row
             Iterator<Cell> cellIterator = row.cellIterator();
-
+            ArrayList<String> rowData = new ArrayList<>();
             while (cellIterator.hasNext()) {
                 if (row.getRowNum() == 1) break;
+
                 Cell cell = cellIterator.next();
                 String cellValue = dataFormatter.formatCellValue(cell);
-                System.out.print(cellValue + "\t");
+                rowData.add(cellValue);
 
             }
-            System.out.println("****");
+            if (rowData.size() == 5) {
+                saveRow(rowData, sheetName);
+            }
         }
 
 
     }
 
+    private void saveRow(ArrayList<String> row, String sheet) {
+        OtcCandaDisclosure disclosure = new OtcCandaDisclosure();
+        disclosure.setIssuer_name(row.get(0));
+        disclosure.setTicker(row.get(1));
+        disclosure.setMarket(row.get(2));
+        disclosure.setNo_of_shorted_shares_position(row.get(3));
+        disclosure.setNet_change(row.get(4));
+        String key = sheet + row.get(0) + row.get(1);
+        disclosures.put(key, disclosure);
+
+//        System.out.println("issuerName ->" + row.get(0));
+//        System.out.println("ticker ->" + row.get(1));
+//        System.out.println("Market ->" + row.get(2));
+//        System.out.println(" no_of_shorted_shares_position ->" + row.get(3));
+//        System.out.println("net_change ->" + row.get(4));
+//        System.out.println("****");
+    }
+
     private void downloadExcel(String url) {
-        StringBuffer response=new StringBuffer();
+        StringBuffer response = new StringBuffer();
         try {
             URL link = new URL(url);
             HttpsURLConnection getConnection = (HttpsURLConnection) link.openConnection();
@@ -136,10 +160,11 @@ public class OtcCanada {
             getConnection.setReadTimeout(10000);
             getConnection.setRequestMethod("GET");
             getConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-            try (InputStream inputStream =  getConnection.getInputStream()) {
+            try (InputStream inputStream = getConnection.getInputStream()) {
+                System.out.println(url);
                 readExcel(inputStream);
             }
-        }catch (IOException | InvalidFormatException ex){
+        } catch (IOException | InvalidFormatException ex) {
             ex.getCause();
         }
 
