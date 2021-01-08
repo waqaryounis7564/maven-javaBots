@@ -163,35 +163,35 @@ public class Canda {
         Date parseDate = sdf1.parse(date);
 
 
-        try {
-            disclosure.setTicker(anns[0]);
-            disclosure.setIssuer_name(anns[1].replace("\"", ""));
-            disclosure.setMarket(anns[2].replace("\"", ""));
-            disclosure.setShort_sale_trades(Long.parseLong(anns[3]));
-            disclosure.setPercent_of_total_trades(new BigDecimal(anns[4]));
-            disclosure.setShort_selling_volume(Long.parseLong(anns[5]));
-            disclosure.setPercent_of_total_traded_volume(new BigDecimal(anns[6]));
-            disclosure.setShort_sell_traded_value(Long.parseLong(anns[7]));
-            disclosure.setPercent_of_total_traded_value(new BigDecimal(anns[8]));
-            disclosure.setUrl(url);
-        } catch (NumberFormatException ex) {
-//            logger.info(ex.getMessage());
+//        try {
+//            disclosure.setTicker(anns[0]);
+//            disclosure.setIssuer_name(anns[1].replace("\"", ""));
+//            disclosure.setMarket(anns[2].replace("\"", ""));
+//            disclosure.setShort_sale_trades(Long.parseLong(anns[3]));
+//            disclosure.setPercent_of_total_trades(new BigDecimal(anns[4]));
+//            disclosure.setShort_selling_volume(Long.parseLong(anns[5]));
+//            disclosure.setPercent_of_total_traded_volume(new BigDecimal(anns[6]));
+//            disclosure.setShort_sell_traded_value(Long.parseLong(anns[7]));
+//            disclosure.setPercent_of_total_traded_value(new BigDecimal(anns[8]));
+//            disclosure.setUrl(url);
+//        } catch (NumberFormatException ex) {
+////            logger.info(ex.getMessage());
             return;
         }
-        System.out.println(disclosure.getReporting_date());
-        System.out.println(disclosure.getTicker());
-        System.out.println(disclosure.getIssuer_name());
-        System.out.println(disclosure.getMarket());
-        System.out.println(disclosure.getShort_selling_volume());
-        System.out.println(disclosure.getPercent_of_total_traded_volume());
-        System.out.println(disclosure.getShort_sell_traded_value());
-        System.out.println(disclosure.getPercent_of_total_traded_value());
-        System.out.println(disclosure.getUrl());
-        // call db
-        System.out.println("*************");
+//        System.out.println(disclosure.getReporting_date());
+////        System.out.println(disclosure.getTicker());
+////        System.out.println(disclosure.getIssuer_name());
+////        System.out.println(disclosure.getMarket());
+////        System.out.println(disclosure.getShort_selling_volume());
+////        System.out.println(disclosure.getPercent_of_total_traded_volume());
+////        System.out.println(disclosure.getShort_sell_traded_value());
+////        System.out.println(disclosure.getPercent_of_total_traded_value());
+////        System.out.println(disclosure.getUrl());
+////        // call db
+//        System.out.println("*************");
 
     }
-}
+//}
 /**
  * public void post() throws Exception
  * {
