@@ -9,13 +9,15 @@ import org.jsoup.select.Elements;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.print.attribute.standard.MediaSize;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Canada {
@@ -46,8 +48,10 @@ public class Canada {
             extractData(document);
 
         });
+        records.values().forEach(record -> downloadUrl(record));
 
     }
+
 
     private String getContent(String obj) {
         String response = "";
@@ -104,8 +108,8 @@ public class Canada {
         for (Element element : elements) {
             String reportingDate = element.select("td:nth-child(1)").text();
             String link = "https://www.iiroc.ca/" + element.select("td:nth-child(2)>a").attr("href");
-            String positionDate =element.select("td:nth-child(2)>a").text();
-            positionDate=positionDate.split("-")[1].replace("_ShortSaleTradingSummaryReport","").trim();
+            String positionDate = element.select("td:nth-child(2)>a").text();
+            positionDate = positionDate.split("-")[1].replace("_ShortSaleTradingSummaryReport", "").trim();
             record.setPositionDate(positionDate);
             record.setReportingDate(reportingDate);
             record.setUrl(link);
@@ -113,6 +117,88 @@ public class Canada {
         }
 
 
+    }
+
+    private void downloadUrl(CanadaRecord record) {
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) (new URL(record.getUrl()).openConnection());
+            httpURLConnection.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36");
+            if (httpURLConnection.getResponseCode() == 404) return;
+            try (InputStream inputStream = httpURLConnection.getInputStream()) {
+
+                try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream)) {
+
+                    try (BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+
+                        String line = bufferedReader.readLine();
+                        while (line != null) {
+                            System.out.println(record.getUrl());
+                            saveCsvLine(line, record);
+                            line = bufferedReader.readLine();
+                        }
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            ex.getMessage();
+        }
+    }
+
+    private void saveCsvLine(String line, CanadaRecord record) {
+        String[] anns = line.split(",(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)");
+        CanadaDisclosure disclosure = new CanadaDisclosure();
+        disclosure.setReporting_date(getReportingDate(record.getReportingDate()));
+        disclosure.setPosition_date(getPositionDate(record.getPositionDate()));
+        disclosure.setTicker(anns[0]);
+        disclosure.setIssuer_name(anns[1].replace("\"", ""));
+        disclosure.setMarket(anns[2].replace("\"", ""));
+        disclosure.setShort_sale_trades(anns[3]);
+        disclosure.setPercent_of_total_trades(anns[4]);
+        disclosure.setShort_selling_volume(anns[5]);
+        disclosure.setPercent_of_total_traded_volume(anns[6]);
+        disclosure.setShort_sell_traded_value(anns[7]);
+        disclosure.setPercent_of_total_traded_value(anns[8]);
+        disclosure.setUrl(record.getUrl());
+        String key = record.getUrl() + anns[0] + anns[1];
+        disclosures.put(key, disclosure);
+
+        System.out.println(disclosure.getReporting_date());
+        System.out.println(disclosure.getPosition_date());
+        System.out.println(disclosure.getTicker());
+        System.out.println(disclosure.getIssuer_name());
+        System.out.println(disclosure.getMarket());
+        System.out.println(disclosure.getShort_selling_volume());
+        System.out.println(disclosure.getPercent_of_total_traded_volume());
+        System.out.println(disclosure.getShort_sell_traded_value());
+        System.out.println(disclosure.getPercent_of_total_traded_value());
+        System.out.println(disclosure.getUrl());
+
+
+    }
+
+    private String getPositionDate(String date) {
+
+        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("yyyyMMdd");
+        Date output = null;
+        try {
+            output = simpleDateFormat1.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat2.format(output);
+    }
+
+    private String getReportingDate(String date) {
+        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("MM/dd/yyyy");
+        Date output = null;
+        try {
+            output = simpleDateFormat1.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat2.format(output);
     }
 
 }
