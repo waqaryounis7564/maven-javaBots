@@ -46,7 +46,7 @@ public class Canada {
             extractData(document);
 
         });
-records.values().forEach(obj-> System.out.println(MessageFormat.format("{0}->{1},{2}",obj.getReportingDate(),obj.getPositionDate(),obj.getUrl())));
+
     }
 
     private String getContent(String obj) {
@@ -110,7 +110,6 @@ records.values().forEach(obj-> System.out.println(MessageFormat.format("{0}->{1}
             record.setReportingDate(reportingDate);
             record.setUrl(link);
             records.put(link, record);
-
         }
 
 

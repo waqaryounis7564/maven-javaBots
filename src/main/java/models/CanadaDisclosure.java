@@ -4,6 +4,16 @@ import java.math.BigDecimal;
 
 public class CanadaDisclosure {
     private String reporting_date;
+
+    public String getPosition_date() {
+        return position_date;
+    }
+
+    public void setPosition_date(String position_date) {
+        this.position_date = position_date;
+    }
+
+    private String position_date;
     private String ticker;
     private String issuer_name;
     private String market;
