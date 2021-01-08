@@ -1,3 +1,4 @@
+import services.SDS.Canada;
 import services.SDS.Korea;
 import services.SDS.OtcCanada;
 import services.Testable;
@@ -13,8 +14,8 @@ import java.util.Locale;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        OtcCanada otcCanada=new OtcCanada();
-        otcCanada.scrape();
+        Canada canada=new Canada();
+        canada.scrape();
 
     }
 
