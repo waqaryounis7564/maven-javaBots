@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,27 +28,8 @@ import java.util.regex.Pattern;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        String url = "https://market-reports.thecse.com/CSEListed/SemiMonthly/ShortPositions/CSEListed.SemiMonthly.Market.ShortPositions.2012-09-15.xls";
-        downloadExcel(url);
+downloadExcel("https://www.iiroc.ca/Documents/2021/89c51534-baa6-4d48-a11c-9a2ba195b2cb_en.xls");
     }
-
-    private static void downloadExcel(String url) {
-        try {
-            URL link = new URL(url);
-            HttpsURLConnection getConnection = (HttpsURLConnection) link.openConnection();
-            getConnection.setConnectTimeout(10000);
-            getConnection.setReadTimeout(10000);
-            getConnection.setRequestMethod("GET");
-            getConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-            try (InputStream inputStream = getConnection.getInputStream()) {
-                readExcel(inputStream);
-            }
-        } catch (IOException | InvalidFormatException ex) {
-            ex.getCause();
-        }
-
-    }
-
     private static void readExcel(InputStream input) throws IOException, InvalidFormatException {
         Workbook wb = WorkbookFactory.create(input);
         Sheet sheet = wb.getSheetAt(0);
@@ -58,45 +40,35 @@ public class Main {
             Iterator<Cell> cellIterator = row.cellIterator();
             ArrayList<String> rowData = new ArrayList<>();
             while (cellIterator.hasNext()) {
-
-                if (row.getRowNum() <= 2) break;
-
+                if (row.getRowNum() == 1) break;
                 Cell cell = cellIterator.next();
                 String cellValue = dataFormatter.formatCellValue(cell);
-                    rowData.add(cellValue);
-
-
+                rowData.add(cellValue);
             }
-            if (rowData.size() == 4 && !rowData.stream().limit(2).allMatch(String::isEmpty)) {
-                String shorted = rowData.get(2).replace("(", "").replace(")", "").replace(",", "").trim();
-                String netChange = rowData.get(3).replace("(", "").replace(")", "").replace(",", "").trim();
-                if (netChange.toLowerCase().contains("net")) continue;
-                if (shorted.equals("- 0") && netChange.equals("- 0") || shorted.equals("0") && netChange.equals("0")) continue;
-//                if (shorted.equals("- 0") && !netChange.equals("- 0")) {
-//                    shorted = "0";
-//                }
-                System.out.println("issuer name-->" + rowData.get(0));
-                System.out.println("ticker-->" + rowData.get(1));
-                System.out.println("no_of_shorted_shares_position-->" + shorted);
-                System.out.println("net change-->" + netChange);
-                System.out.println("//////////////////////////////");
-
+            if (rowData.size() == 5) {
+                System.out.println(MessageFormat.format("{0},{1},{2},{3},{4}",rowData.get(0),rowData.get(1),rowData.get(2),rowData.get(3),rowData.get(4)));
             }
         }
-
+    }
+    private  static void downloadExcel(String url) {
+        try {
+            URL link = new URL(url);
+            HttpsURLConnection getConnection = (HttpsURLConnection) link.openConnection();
+            getConnection.setConnectTimeout(10000);
+            getConnection.setReadTimeout(10000);
+            getConnection.setRequestMethod("GET");
+            getConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            try (InputStream inputStream = getConnection.getInputStream()) {
+                System.out.println(url);
+                readExcel(inputStream);
+            }
+        } catch (IOException | InvalidFormatException ex) {
+            ex.getCause();
+        }
 
     }
+    }
 
-    /*
-    * ISSUE = Issuer name
-Symbol= Ticker
-No of shares = no_of_shorted_shares_position
-Market = CSE hee rakhni hai
-NET CHANGE = Net change
-    *
-    * */
 
-//\d{4}-\d{2}-\d{2}
 
-}
 
