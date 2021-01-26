@@ -27,11 +27,12 @@ public class Crotia {
             webClient.getOptions().setJavaScriptEnabled(false);
 
             HtmlPage page = webClient.getPage(url);
-            DomElement btn = page.querySelector("#c4 > div > div > div.row.pt-2.pb-4 > div > div > nav > ul > li:nth-child(24) > a");
             consumeRow(page.asXml());
+            DomElement nxtBtn = page.querySelector("#c4 > div > div > div.row.pt-2.pb-4 > div > div > nav > ul > li:nth-child(24) > a");
             while (true) {
-                HtmlPage page2 = btn.click();
+                HtmlPage page2 = nxtBtn.click();
                 consumeRow(page2.asXml());
+             nxtBtn = page2.querySelector("#c4 > div > div > div.row.pt-2.pb-4 > div > div > nav > ul > li:nth-child(24) > a");
                 if(historic) break;
             }
 
@@ -73,7 +74,7 @@ public class Crotia {
         int year = cal.get(Calendar.YEAR);
 
         if (month < 10 && year == 2021) historic = false;
-        else historic = (month >= 10);
+        else historic = (month <= 10);
     }
 
 
