@@ -1,26 +1,25 @@
-import services.SDS.Canada;
-import services.SDS.Korea;
-import services.SDS.OtcCanada;
-import services.Testable;
-import services.USA_form;
-import services.sbb.Crotia;
 import services.sbb.Japan;
 
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        Japan.scrape();
+
+        try(BufferedReader csvReader = new BufferedReader(new FileReader("src/main/static/zillow.csv"))){
+            String line;
+            csvReader.readLine(); // skipping headers
+            while ((line=csvReader.readLine())!=null){
+                System.out.println(line);
+            }
+        }
+
+//                Japan.scrape();
 
     }
-
-
 
 
 }
