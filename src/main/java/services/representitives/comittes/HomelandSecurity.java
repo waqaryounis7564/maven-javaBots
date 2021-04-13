@@ -17,6 +17,8 @@ public class HomelandSecurity {
         System.out.println("REPUBLICAN");
         Elements minority = document.select("#main_column > section.minority > div > aside > div>div");
         minority.forEach(m -> System.out.println(m.text()));
+        String text = document.select("#ctl00_ctl24_ctl00_Text > p").text();
+        if (text.isEmpty()) System.out.println("error");
 
 
     }

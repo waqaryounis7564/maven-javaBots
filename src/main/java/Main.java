@@ -1,35 +1,90 @@
-import org.apache.pdfbox.debugger.streampane.Stream;
+
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-import services.SDS.Canada;
-import services.SDS.Korea;
-import services.SDS.OtcCanada;
-import services.Testable;
-import services.USA_form;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import services.America;
+import services.representitives.comittes.*;
+import services.sbb.Belgium;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import java.io.*;
+
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
+
 import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+class Parent {
+    private final String name;
+
+    Parent(String name) {
+        this.name = name;
+    }
+}
+
+class Child extends Parent {
+    private String name;
+
+    Child(String name) {
+        super(name);
+    }
+}
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-downloadExcel("https://www.iiroc.ca/Documents/2021/89c51534-baa6-4d48-a11c-9a2ba195b2cb_en.xls");
+        Belgium.crawl();
+
+//        Agriculture america = new Agriculture();
+//        america.scrape();
+//        OversightandReform.scrape();
+
+//        WebDriver driver = new ChromeDriver();
+//        driver.navigate().to("https://www.londonstockexchange.com/news-article/BGHS/Cancellation of euro shares held in treasury/14834659");
+//        driver.manage().window().maximize();
+//        String content=driver.getPageSource();
+//        System.out.println(content);
+//        driver.close();
+//        driver.quit();
+
+//        Document document = Jsoup.connect("https://www.londonstockexchange.com/news-article/BGHS/Cancellation of euro shares held in treasury/14834659").get();
+
+//        System.out.println(document.body().select("*"));
+//ScreenShot();
     }
+//    *[@id="news-article-content"]/div[1]
+
+    private static void craw() {
+        try (WebClient webClient = new WebClient()) {
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            HtmlPage page = webClient.getPage("https://www.londonstockexchange.com/news-article/BGHS/Cancellation of euro shares held in treasury/14834659");
+            webClient.waitForBackgroundJavaScript(2000);
+            DomElement btn = page.querySelector("#news-article-content > div.news-article-content-wrapper > div.news-intro > div > div.share-wrapper.mobile-flex-wrapper > span > button");
+            HtmlPage click = btn.click();
+            System.out.println(click.querySelector("body").asXml());
+
+//            List<Object> xPath = page.getByXPath("/html/body/app-root/app-handshake/div/app-page-content/app-news-article-content/section/div[1]");
+//            System.out.println(xPath.get(0));
+
+
+        } catch (MalformedURLException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
     private static void readExcel(InputStream input) throws IOException, InvalidFormatException {
         Workbook wb = WorkbookFactory.create(input);
         Sheet sheet = wb.getSheetAt(0);
@@ -46,11 +101,12 @@ downloadExcel("https://www.iiroc.ca/Documents/2021/89c51534-baa6-4d48-a11c-9a2ba
                 rowData.add(cellValue);
             }
             if (rowData.size() == 5) {
-                System.out.println(MessageFormat.format("{0},{1},{2},{3},{4}",rowData.get(0),rowData.get(1),rowData.get(2),rowData.get(3),rowData.get(4)));
+                System.out.println(MessageFormat.format("{0},{1},{2},{3},{4}", rowData.get(0), rowData.get(1), rowData.get(2), rowData.get(3), rowData.get(4)));
             }
         }
     }
-    private  static void downloadExcel(String url) {
+
+    private static void downloadExcel(String url) {
         try {
             URL link = new URL(url);
             HttpsURLConnection getConnection = (HttpsURLConnection) link.openConnection();
@@ -67,7 +123,7 @@ downloadExcel("https://www.iiroc.ca/Documents/2021/89c51534-baa6-4d48-a11c-9a2ba
         }
 
     }
-    }
+}
 
 
 
