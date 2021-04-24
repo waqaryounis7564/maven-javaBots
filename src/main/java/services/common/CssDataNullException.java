@@ -7,7 +7,7 @@ public class CssDataNullException extends Exception {
         super("unable to get data, Css query not works");
     }
 
-    CssDataNullException(String message) {
+    public CssDataNullException(String message) {
         super(message);
     }
 }
