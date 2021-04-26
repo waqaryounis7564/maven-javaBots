@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import services.SDS.Canada;
 import services.SDS.Korea;
 import services.SDS.OtcCanada;
+import services.SenatorData;
 import services.Testable;
 import services.Testing;
 import services.USA_form;
@@ -36,20 +37,8 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        Belgium bl = new Belgium();
-
-        if(309%150==0) System.out.println("hi");
-//        bl.startBot();
-
-//        crawl();
-//        for (int i = 0; i < 3; i++) {
-//            try {
-//                Testing.crawl();
-//            } catch (JSONException ex) {
-//                System.out.println(ex.getMessage());
-//            }
-//            crawl();
-//        }
+        SenatorData senatorData=new SenatorData();
+        senatorData.scrapeData(false);
     }
 
     public static void crawl() throws CssDataNullException {
