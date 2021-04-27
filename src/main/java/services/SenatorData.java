@@ -14,6 +14,7 @@ import services.common.SenatorTrades;
 import utils.ParameterUtils;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class SenatorData {
         String report_Link = report_row.select("td:nth-child(4)>a").attr("href");
         String fillingDate = report_row.select("td:nth-child(5)").text();
         fillingDate = ParameterUtils.getDateInYourFormat(fillingDate, "MM/dd/yyyy", "yyyy-MM-dd");
-        System.out.println("--------------" + fillingDate + "-------------------");
+//        System.out.println("--------------" + fillingDate + "-------------------");
 
         String reportUrl = "https://efdsearch.senate.gov" + report_Link;
 
@@ -163,7 +164,16 @@ public class SenatorData {
     }
 
     private void writeToDB(SenatorFiling senatorFiling) {
-
+        System.out.println(MessageFormat.format("{0}-----{1}", senatorFiling.getFirstName(), senatorFiling.getDateFiled()));
+        System.out.println("********");
+        if (senatorFiling.getJpgLinks() != null) {
+            System.out.println(MessageFormat.format("Jpg links size : {0}", senatorFiling.getJpgLinks().size()));
+        }
+        System.out.println("********");
+        if (senatorFiling.getSenatorTradesList() != null) {
+            System.out.println(MessageFormat.format("Senator trades size : {0}", senatorFiling.getSenatorTradesList().size()));
+        }
+        System.out.println("------------------------------");
     }
 
 }
