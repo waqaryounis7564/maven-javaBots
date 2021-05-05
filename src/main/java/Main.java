@@ -1,44 +1,75 @@
-import org.apache.pdfbox.debugger.streampane.Stream;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import services.SDS.Canada;
-import services.SDS.Korea;
-import services.SDS.OtcCanada;
-import services.SenatorData;
-import services.Testable;
-import services.Testing;
-import services.USA_form;
 import services.common.CssDataNullException;
-import services.sbb.Belgium;
+import services.sbb.Finland;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        SenatorData senatorData=new SenatorData();
-        senatorData.scrapeData(false);
+        StringBuilder response = new StringBuilder();
+        URL src = new URL("https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=Main%20Market%2C+Helsinki&cnscategory=Changes+in+company%27s+own+shares&fromDate=1614920677970&toDate=1617598950537&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
+        HttpURLConnection httpConn = (HttpURLConnection) src.openConnection();
+        httpConn.setRequestMethod("GET");
+        httpConn.setRequestProperty("authority", "api.news.eu.nasdaq.com");
+        httpConn.setRequestProperty("sec-ch-ua", "^\\^");
+        httpConn.setRequestProperty("sec-ch-ua-mobile", "?0");
+        httpConn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+        httpConn.setRequestProperty("accept", "*/*");
+        httpConn.setRequestProperty("sec-fetch-site", "cross-site");
+        httpConn.setRequestProperty("sec-fetch-mode", "no-cors");
+        httpConn.setRequestProperty("sec-fetch-dest", "script");
+        httpConn.setRequestProperty("referer", "http://www.nasdaqomxnordic.com/");
+        httpConn.setRequestProperty("accept-language", "en-US,en;q=0.9");
+
+        InputStream responseStream = httpConn.getResponseCode() / 100 == 2 ? httpConn.getInputStream() : httpConn.getErrorStream();
+        try (InputStreamReader inputStreamReader = new InputStreamReader(responseStream);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        ) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                response.append(line);
+            }
+        }
+        String result = response.toString();
+        int startIndex = result.indexOf("{");
+        int lastIndex = result.lastIndexOf(")");
+        String substring = result.substring(startIndex, lastIndex);
+        JSONObject jsonObject = new JSONObject(substring);
+        JSONArray jsonArray = jsonObject.getJSONObject("results").getJSONArray("item");
+        for (int index = 0; index < jsonArray.length(); index++) {
+            JSONObject obj = (JSONObject) jsonArray.get(index);
+            int rnsId = (int) obj.get("disclosureId");
+            String headline = (String) obj.get("headline");
+            String company = (String) obj.get("company");
+            String url = (String) obj.get("messageUrl");
+            String date = (String) obj.get("releaseTime");
+            System.out.println(MessageFormat.format("{0}--{1}--{2},{3},{4}", rnsId, headline, company, url, date));
+
+        }
+    }
+
+
+    private static int getTotalPages(String url) {
+        Document document = null;
+        try {
+            document = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Integer.parseInt(document.select("body > div > b:nth-child(3)").text());
+//        return (int) Math.ceil(totalRecords / 80.0);
     }
 
     public static void crawl() throws CssDataNullException {
