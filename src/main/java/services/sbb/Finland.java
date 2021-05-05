@@ -1,7 +1,7 @@
 package services.sbb;
 
 
-import com.google.gson.JsonObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,14 +13,24 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Timestamp;
 
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 
 public class Finland {
-    public void crawl() {
-        Long today = today();
-        System.out.println(today);
+    public void crawl() throws IOException {
+        Long toDate = getTimeStamp(today());
+        long fromDate = getTimeStamp(getMonthAgoDate(1));
+        int recordsCount = 0;
+        while (true) {
+            String url = getUrl(fromDate, toDate, recordsCount);
+            String response = getReponse(url);
+            processJsonData(response);
+            if (isLastPage(response)) break;
+            recordsCount += 20;
+
+        }
     }
 
     public long getTimeStamp(long time) {
@@ -40,11 +50,11 @@ public class Finland {
         return cal.getTime().getTime();
     }
 
-    public String getUrl(String fromDate, String toDate, int recordStart) {
+    public String getUrl(long fromDate, long toDate, int recordStart) {
         return "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=Main%20Market%2C+Helsinki&cnscategory=Changes+in+company%27s+own+shares&fromDate=" + fromDate + "&toDate=" + toDate + "&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=" + recordStart + "&dir=DESC";
     }
 
-    private String GetReponse(String url) throws IOException {
+    private String getReponse(String url) throws IOException {
         StringBuilder response = new StringBuilder();
         URL src = new URL(url);
         HttpURLConnection httpConn = (HttpURLConnection) src.openConnection();
@@ -78,12 +88,39 @@ public class Finland {
     private void processJsonData(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-//            jsonObject
+            JSONArray jsonArray = jsonObject.getJSONObject("results").getJSONArray("item");
+            for (int index = 0; index < jsonArray.length(); index++) {
+                JSONObject obj = (JSONObject) jsonArray.get(index);
+                String  rnsId =  obj.get("disclosureId").toString();
+                String headline = (String) obj.get("headline");
+                String company = (String) obj.get("company");
+                String url = (String) obj.get("messageUrl");
+                String date = (String) obj.get("releaseTime");
+                System.out.println(MessageFormat.format("{0}--{1}--{2},{3},{4}", rnsId, headline, company, url, date));
+                //BotAnnouncement anns=new BotAnnouncement();
 
-        }catch (JSONException ex){
+
+            }
+        } catch (JSONException ex) {
 
         }
+    }
 
+    private boolean isLastPage(String response) {
+        boolean result = false;
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONObject("results").getJSONArray("item");
+            result = jsonArray.isEmpty();
+        } catch (JSONException ex) {
+        }
+        return result;
+    }
+
+    private void saveToDB() {
 
     }
 }
+
+
+
