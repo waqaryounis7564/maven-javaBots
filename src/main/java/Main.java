@@ -1,55 +1,60 @@
-import org.apache.pdfbox.debugger.streampane.Stream;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import services.SDS.Canada;
-import services.SDS.Korea;
-import services.SDS.OtcCanada;
-import services.Testable;
-import services.Testing;
-import services.USA_form;
 import services.common.CssDataNullException;
-import services.sbb.Belgium;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        Belgium bl = new Belgium();
+        String s = crawlFormTen("https://www.sec.gov/cgi-bin/current?q1=0&q2=0&q3=");
+        Elements a = Jsoup.parse(s).select("table>tr");
+        System.out.println(a);
+    }
 
-        if(309%150==0) System.out.println("hi");
-//        bl.startBot();
+    private static String crawlFormTen(String srcUrl) {
+        String response = null;
+        try {
+            URL url = new URL(srcUrl);
+            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setRequestMethod("GET");
+            httpConn.setRequestProperty("authority", "www.sec.gov");
+            httpConn.setRequestProperty("cache-control", "max-age=0");
+            httpConn.setRequestProperty("sec-ch-ua", "^\\^");
+            httpConn.setRequestProperty("sec-ch-ua-mobile", "?0");
+            httpConn.setRequestProperty("upgrade-insecure-requests", "1");
+            httpConn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36 Edg/90.0.818.62");
+            httpConn.setRequestProperty("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+            httpConn.setRequestProperty("sec-fetch-site", "same-origin");
+            httpConn.setRequestProperty("sec-fetch-mode", "navigate");
+            httpConn.setRequestProperty("sec-fetch-user", "?1");
+            httpConn.setRequestProperty("sec-fetch-dest", "document");
+            httpConn.setRequestProperty("referer", "https://www.sec.gov/edgar/searchedgar/currentevents.htm");
+            httpConn.setRequestProperty("accept-language", "en-US,en;q=0.9");
 
-//        crawl();
-//        for (int i = 0; i < 3; i++) {
-//            try {
-//                Testing.crawl();
-//            } catch (JSONException ex) {
-//                System.out.println(ex.getMessage());
-//            }
-//            crawl();
-//        }
+            try (InputStream responseStream = httpConn.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream))) {
+                StringBuilder line = new StringBuilder();
+                String line1;
+                while ((line1 = reader.readLine()) != null) {
+                    line.append(line1);
+                }
+                response = line.toString();
+            }
+        } catch (IOException e) {
+//            logger.error(Arrays.toString(e.getStackTrace()));
+        }
+        return response;
     }
 
     public static void crawl() throws CssDataNullException {
