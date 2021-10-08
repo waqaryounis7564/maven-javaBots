@@ -1,20 +1,22 @@
-
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import services.representitives.comittes.Agriculture;
-
+import services.SDS.PtService;
 
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        Agriculture agriculture=new Agriculture();
-        String scrape = agriculture.scrape();
-        System.out.println(Jsoup.parse( scrape).html());
 
+        PtService.scrape();
     }
-
-
 }
+
+
+
+
+
+
+
 
 
 
