@@ -21,28 +21,32 @@ public class Main {
     String srcUrl = "https://ft-api.prod.oam.finanstilsynet.dk/external/v0.1/trigger/dfsa-search-announcement";
     final String USER_AGENT = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Mobile Safari/537.36";
     String refrerer = "https://oam.finanstilsynet.dk/";
+    for (int skip = 0; skip <= 100; skip += 25) {
 
-    String jsonBody = "{\"SortField\":\"RegistrationDate\",\"Ascending\":false,\"Skip\":0,\"Take\":25,\"Status\":[\"Published\"],\"InformationTypes\":[\"DFSAInformationType/0528038b-b549-4636-8eb1-adee0126e728\"],\"IncludeHistoric\":true}";
+      String jsonBody = "{\"SortField\":\"RegistrationDate\",\"Ascending\":false,\"Skip\":" + skip
+          + ",\"Take\":25,\"Status\":[\"Published\"],\"InformationTypes\":[\"DFSAInformationType/0528038b-b549-4636-8eb1-adee0126e728\"],\"IncludeHistoric\":true}";
 
-    Connection.Response response = Jsoup.connect(srcUrl)
-        .userAgent(USER_AGENT)
-        .header("Content-Type", "application/json")
-        .followRedirects(true)
-        .ignoreHttpErrors(true)
-        .ignoreContentType(true)
-        .header("Accept", "application/json")
-        .header("Accept-Language", "en-US,en;q=0.9")
-        .header("User-Agent", USER_AGENT)
-        .header("referer", refrerer)
-        .requestBody(jsonBody)
-        .method(Connection.Method.POST)
-        .execute();
-    JSONObject data = new JSONObject(response.body());
-    JSONArray jsonArray = data.getJSONArray("data");
-    for (int i = 0; i < jsonArray.length(); i++) {
-      String annId = jsonArray.getJSONObject(i).getString("Id");
-      getAnnData(annId);
+      Connection.Response response = Jsoup.connect(srcUrl)
+          .userAgent(USER_AGENT)
+          .header("Content-Type", "application/json")
+          .followRedirects(true)
+          .ignoreHttpErrors(true)
+          .ignoreContentType(true)
+          .header("Accept", "application/json")
+          .header("Accept-Language", "en-US,en;q=0.9")
+          .header("User-Agent", USER_AGENT)
+          .header("referer", refrerer)
+          .requestBody(jsonBody)
+          .method(Connection.Method.POST)
+          .execute();
+      JSONObject data = new JSONObject(response.body());
+      JSONArray jsonArray = data.getJSONArray("data");
+      for (int i = 0; i < jsonArray.length(); i++) {
+        String annId = jsonArray.getJSONObject(i).getString("Id");
+        getAnnData(annId);
 
+      }
+      System.out.println("----------------------------------------------");
     }
 
   }
