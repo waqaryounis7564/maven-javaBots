@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
@@ -14,11 +16,26 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import utils.ParameterUtils;
 
 
 public class Main {
 
   public static void main(String[] args) throws Exception {
+
+    String dt = "2021-12-21T23:02:22.9Z";
+    System.out.println(getFormattedDate(dt));
+
+//          String companyName = row.select("td.oddnew-M kjName ").text();
+//            String link = row.getElementsByTag("a").attr("href");
+//           String headLine = row.text();
+//            System.out.println(headLine);
+//            String dateTime = row.select("td.oddnew-L kjTime").first().text();
+    // dateTime = dateTime.replace("-", "");
+
 //
 //    String srcUrl = "https://ft-api.prod.oam.finanstilsynet.dk/external/v0.1/trigger/dfsa-search-announcement";
 //    final String USER_AGENT = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Mobile Safari/537.36";
@@ -117,22 +134,32 @@ public class Main {
 //
 //    System.out.println("******************************");
 
-
   }
 
   public static String getFormattedDate(String date) throws ParseException {
     Date simpleDateFormat = null;
+    Calendar calendar = Calendar.getInstance();
+    String result = null;
     try {
       simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS'Z'").parse(date);
+      calendar.setTime(simpleDateFormat);
+      calendar.add(Calendar.HOUR_OF_DAY, 1);
+      simpleDateFormat = calendar.getTime();
+      result =  ParameterUtils
+          .getDateInYourFormat(simpleDateFormat.toString(), "EEE MMM dd HH:mm:ss zzz yyyy", "yyyy-MM-dd");
 
     } catch (ParseException e) {
       simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS.SSS'Z'").parse(date);
+      calendar.setTime(simpleDateFormat);
+      calendar.add(Calendar.HOUR, 1);
+      simpleDateFormat = calendar.getTime();
+      result =  ParameterUtils
+          .getDateInYourFormat(simpleDateFormat.toString(), "EEE MMM dd HH:mm:ss zzz yyyy", "yyyy-MM-dd");
     }
-    ZonedDateTime zdt = ZonedDateTime.ofInstant(simpleDateFormat.toInstant(), ZoneId
-        .of("GMT+7"));
 
-    LocalDate dateTime = zdt.toLocalDate();
-    return dateTime.toString();
+    return result;
   }
+
+
 
 }
