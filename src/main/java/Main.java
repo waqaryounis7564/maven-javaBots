@@ -1,33 +1,33 @@
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 
-import java.io.IOException;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import utils.ParameterUtils;
 
 
 public class Main {
 
   public static void main(String[] args) throws Exception {
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    Date startDate = formatter.parse("2010-12-20");
+    Date endDate = formatter.parse("2010-12-26");
 
-    String dt = "2021-12-21T23:02:22.9Z";
-    System.out.println(getFormattedDate(dt));
+    Calendar start = Calendar.getInstance();
+    start.setTime(startDate);
+    Calendar end = Calendar.getInstance();
+    end.setTime(endDate);
+
+    for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
+Date simpleDateFormat=new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(date.toString());
+      String dateInYourFormat = ParameterUtils
+          .getDateInYourFormat(simpleDateFormat.toString(), "EEE MMM dd HH:mm:ss zzz yyyy",
+              "yyyy-MM-dd");
+      System.out.println(dateInYourFormat);
+    }
+      // Do your job here with `date`.
+
 
 //          String companyName = row.select("td.oddnew-M kjName ").text();
 //            String link = row.getElementsByTag("a").attr("href");
@@ -160,6 +160,29 @@ public class Main {
     return result;
   }
 
+  public static String getRowCreationDate(String date) throws ParseException {
+    Date simpleDateFormat = null;
+    Calendar calendar = Calendar.getInstance();
+    String result = null;
+    try {
+      simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS'Z'").parse(date);
+      calendar.setTime(simpleDateFormat);
+      calendar.add(Calendar.HOUR_OF_DAY, 1);
+      simpleDateFormat = calendar.getTime();
+      result =  ParameterUtils
+          .getDateInYourFormat(simpleDateFormat.toString(), "EEE MMM dd HH:mm:ss zzz yyyy", "yyyy-MM-dd HH:mm:ss");
+
+    } catch (ParseException e) {
+      simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SS.SSS'Z'").parse(date);
+      calendar.setTime(simpleDateFormat);
+      calendar.add(Calendar.HOUR, 1);
+      simpleDateFormat = calendar.getTime();
+      result =  ParameterUtils
+          .getDateInYourFormat(simpleDateFormat.toString(), "EEE MMM dd HH:mm:ss zzz yyyy", "yyyy-MM-dd HH:mm:ss");
+    }
+
+    return result;
+  }
 
 
 }
